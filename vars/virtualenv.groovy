@@ -1,14 +1,16 @@
-def create(String python, String path = "venv", boolean installRequirements = true) {
-  sh("virtualenv -p ${python} ${path}")
-  if (installRequirements && fileExists("requirements.txt")) {
-    run(path, "pip install -r requirements.txt")
-  }
+def create(String python, String destDir) {
+  sh("virtualenv --python=${python} ${destDir}")
 }
 
 
-def run(String path = "venv", String command) {
+def installRequirements(String destDir) {
+  run(destDir, "pip install -r requirements.txt")
+}
+
+
+def run(String destDir, String command) {
   sh("""
-    . ./${path}/bin/activate
+    . ./${destDir}/bin/activate
     ${command}
   """)
 }
