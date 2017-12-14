@@ -1,8 +1,10 @@
-def create(String python, String destDir, boolean installRequirements = true) {
+def create(String python, String destDir) {
   sh("virtualenv --python=${python} ${destDir}")
-  if (installRequirements && fileExists("requirements.txt")) {
-    run(destDir, "pip install -r requirements.txt")
-  }
+}
+
+
+def installRequirements(String destDir) {
+  run(destDir, "pip install -r requirements.txt")
 }
 
 
