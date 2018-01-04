@@ -1,4 +1,4 @@
-@Library(['codenarc@0.1.0', 'runthebuilds@0.5.0']) _
+@Library(['codenarc@0.2.0', 'runthebuilds@0.5.0']) _
 
 
 def addStages() {
@@ -9,7 +9,7 @@ def addStages() {
   }
 
   runTheBuilds.timedStage('Test') {
-    parallel(failFast:false,
+    parallel(failFast: false,
       codenarc: {
         codenarc.check('**/Jenkinsfile,**/*.gradle,**/*.groovy')
       },
@@ -19,18 +19,18 @@ def addStages() {
 
 
 runTheBuilds.runForSpecificBranches(runTheBuilds.COMMON_BRANCH_FILTERS, true) {
-  node("generic-linux") {
+  node('generic-linux') {
     try {
-      runTheBuilds.report("pending", env.CALLBACK_URL)
+      runTheBuilds.report('pending', env.CALLBACK_URL)
       addStages()
-      runTheBuilds.report("success", env.CALLBACK_URL)
+      runTheBuilds.report('success', env.CALLBACK_URL)
     }
     catch (error) {
-      runTheBuilds.report("failure", env.CALLBACK_URL)
+      runTheBuilds.report('failure', env.CALLBACK_URL)
       throw error
     }
     finally {
-      stage("Cleanup") {
+      stage('Cleanup') {
         dir(env.WORKSPACE) {
           deleteDir()
         }
