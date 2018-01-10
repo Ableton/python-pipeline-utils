@@ -9,7 +9,6 @@ class VirtualEnv implements Serializable {
   def script
   String destDir
 
-
   VirtualEnv(script, String python) {
     assert script
     assert python
