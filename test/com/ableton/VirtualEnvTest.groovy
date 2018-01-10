@@ -35,4 +35,24 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv.script)
     assertNotNull(venv.destDir)
   }
+
+  @Test
+  void newObjectWithNullScript() throws Exception {
+    try {
+      def venv = new VirtualEnv(null, 'python2.7')
+      fail('Expected exception, but none was thrown')
+    } catch (AssertionError error) {
+      assertNotNull(error)
+    }
+  }
+
+  @Test
+  void newObjectWithNullPython() throws Exception {
+    try {
+      def venv = new VirtualEnv(script, null)
+      fail('Expected exception, but none was thrown')
+    } catch (AssertionError error) {
+      assertNotNull(error)
+    }
+  }
 }

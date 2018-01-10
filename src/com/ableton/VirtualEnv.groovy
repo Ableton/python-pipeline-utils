@@ -11,7 +11,11 @@ class VirtualEnv implements Serializable {
 
 
   VirtualEnv(script, String python) {
+    assert script
+    assert python
+
     this.script = script
+
     final PATH_SEP = script.isUnix() ? "/" : "\\"
     this.destDir = script.pwd(tmp:true) +
       PATH_SEP +
