@@ -21,6 +21,12 @@ class JenkinsMocksTest extends BasePipelineTest {
   }
 
   @Test
+  void echo() throws Exception {
+    // Just a sanity check test to make sure nothing throws
+    JenkinsMocks.echo('test')
+  }
+
+  @Test
   void isUnix() throws Exception {
     // It would be pretty redundant to basically re-implement this method in its own test
     // case, so instead we just call the function and see that it didn't go haywire.

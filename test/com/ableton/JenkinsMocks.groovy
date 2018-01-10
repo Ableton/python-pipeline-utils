@@ -6,6 +6,10 @@ package com.ableton
  * with the JenkinsPipelineUnit library.
  */
 class JenkinsMocks {
+  static Closure echo = { String message ->
+    println message
+  }
+
   static Closure isUnix = {
     return !System.properties['os.name'].toLowerCase().contains('windows')
   }
