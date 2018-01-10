@@ -9,9 +9,12 @@ class VirtualEnv implements Serializable {
   def script
   String destDir
 
-
   VirtualEnv(script, String python) {
+    assert script
+    assert python
+
     this.script = script
+
     final PATH_SEP = script.isUnix() ? "/" : "\\"
     this.destDir = script.pwd(tmp:true) +
       PATH_SEP +
@@ -20,6 +23,11 @@ class VirtualEnv implements Serializable {
       python
   }
 
+  static def create(script, python) {
+    def venv = new VirtualEnv(script, python)
+    venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
+    return venv
+  }
 
   def run(String command) {
     script.sh("""

@@ -13,6 +13,10 @@ def addStages() {
       codenarc: {
         codenarc.check('**/Jenkinsfile,**/*.gradle,**/*.groovy')
       },
+      junit: {
+        sh './gradlew test'
+        junit 'build/test-results/**/*.xml'
+      },
     )
   }
 }
