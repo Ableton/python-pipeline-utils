@@ -24,6 +24,11 @@ class VirtualEnv implements Serializable {
       python
   }
 
+  static def create(script, python) {
+    def venv = new VirtualEnv(script, python)
+    venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
+    return venv
+  }
 
   def run(String command) {
     script.sh("""

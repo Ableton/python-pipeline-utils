@@ -4,6 +4,7 @@ import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
 import org.junit.Test
 
+import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.fail
 
@@ -54,5 +55,14 @@ class VirtualEnvTest extends BasePipelineTest {
     } catch (AssertionError error) {
       assertNotNull(error)
     }
+  }
+
+  @Test
+  void create() throws Exception {
+    def python = 'python2.7'
+    def venv = new VirtualEnv(script, python)
+    JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
+    def createdVenv = VirtualEnv.create(script, python)
+    assertEquals(venv.destDir, createdVenv.destDir)
   }
 }
