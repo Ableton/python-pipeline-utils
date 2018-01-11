@@ -15,15 +15,15 @@ class VirtualEnv implements Serializable {
 
     this.script = script
 
-    final PATH_SEP = script.isUnix() ? "/" : "\\"
-    this.destDir = script.pwd(tmp:true) +
+    final PATH_SEP = script.isUnix() ? '/' : '\\'
+    this.destDir = script.pwd(tmp: true) +
       PATH_SEP +
       script.env.BUILD_NUMBER +
       PATH_SEP +
       python
   }
 
-  static def create(script, python) {
+  static create(script, python) {
     def venv = new VirtualEnv(script, python)
     venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
     return venv

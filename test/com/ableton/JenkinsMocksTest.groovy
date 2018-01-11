@@ -1,25 +1,18 @@
 package com.ableton
 
-import com.lesfurets.jenkins.unit.BasePipelineTest
-import org.junit.Before
-import org.junit.Test
-
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
+
+import com.lesfurets.jenkins.unit.BasePipelineTest
+import org.junit.Test
 
 
 /**
  * Tests for the JenkinsMocks class.
  */
 class JenkinsMocksTest extends BasePipelineTest {
-  @Override
-  @Before
-  void setUp() {
-    super.setUp()
-  }
-
   @Test
   void echo() throws Exception {
     // Just a sanity check test to make sure nothing throws
