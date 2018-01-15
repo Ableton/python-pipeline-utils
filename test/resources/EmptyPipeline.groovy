@@ -1,5 +1,5 @@
 def execute() {
-  node() {
+  node {
     stage('Empty') {}
   }
 }
