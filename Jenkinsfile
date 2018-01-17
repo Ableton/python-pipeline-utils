@@ -1,4 +1,4 @@
-@Library(['ableton-utils@0.1.0', 'codenarc@0.5.0']) _
+@Library(['ableton-utils@0.1.0', 'groovylint@0.1.1']) _
 
 
 def addStages() {
@@ -10,8 +10,8 @@ def addStages() {
 
   runTheBuilds.timedStage('Test') {
     parallel(failFast: false,
-      codenarc: {
-        codenarc.check('**/Jenkinsfile,**/*.gradle,**/*.groovy')
+      groovylint: {
+        groovylint.check('**/Jenkinsfile,**/*.gradle,**/*.groovy')
       },
       junit: {
         sh './gradlew test'
