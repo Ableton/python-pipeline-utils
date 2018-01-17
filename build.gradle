@@ -2,9 +2,13 @@ apply plugin: 'groovy'
 
 repositories {
   mavenCentral()
+  maven {
+    url 'https://jitpack.io'
+  }
 }
 
 dependencies {
+  compile 'com.github.AbletonDevTools:jenkins-pipeline-mocks:0.2.0'
   compile 'org.codehaus.groovy:groovy-all:2.4.10'
 
   testCompile 'junit:junit:4.12'
