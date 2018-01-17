@@ -11,7 +11,7 @@ def addStages() {
   runTheBuilds.timedStage('Test') {
     parallel(failFast: false,
       groovylint: {
-        groovylint.check('**/Jenkinsfile,**/*.gradle,**/*.groovy')
+        groovylint.check('./Jenkinsfile,**/*.gradle,**/*.groovy')
       },
       junit: {
         sh './gradlew test'
