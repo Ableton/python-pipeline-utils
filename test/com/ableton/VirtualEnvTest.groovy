@@ -2,7 +2,7 @@ package com.ableton
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.fail
+import static org.junit.Assert.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
@@ -39,22 +39,26 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWithNullScript() throws Exception {
+    def exceptionThrown = false
     try {
       new VirtualEnv(null, 'python2.7')
-      fail('Expected exception, but none was thrown')
     } catch (AssertionError error) {
+      exceptionThrown = true
       assertNotNull(error)
     }
+    assertTrue(exceptionThrown)
   }
 
   @Test
   void newObjectWithNullPython() throws Exception {
+    def exceptionThrown = false
     try {
       new VirtualEnv(script, null)
-      fail('Expected exception, but none was thrown')
     } catch (AssertionError error) {
+      exceptionThrown = true
       assertNotNull(error)
     }
+    assertTrue(exceptionThrown)
   }
 
   @Test
