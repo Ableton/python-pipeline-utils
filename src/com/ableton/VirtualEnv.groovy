@@ -6,30 +6,33 @@ package com.ableton
  * stored in the job's temporary directory and is unique for each build number.
  */
 class VirtualEnv implements Serializable {
+  @SuppressWarnings('FieldTypeRequired')
   def script
   String destDir
 
-  VirtualEnv(script, String python) {
+  @SuppressWarnings('MethodParameterTypeRequired')
+  VirtualEnv(def script, String python) {
     assert script
     assert python
 
     this.script = script
 
-    final PATH_SEP = script.isUnix() ? '/' : '\\'
+    String pathSep = script.isUnix() ? '/' : '\\'
     this.destDir = script.pwd(tmp: true) +
-      PATH_SEP +
+      pathSep +
       script.env.BUILD_NUMBER +
-      PATH_SEP +
+      pathSep +
       python
   }
 
-  static create(script, python) {
-    def venv = new VirtualEnv(script, python)
+  @SuppressWarnings('MethodParameterTypeRequired')
+  static VirtualEnv create(def script, String python) {
+    VirtualEnv venv = new VirtualEnv(script, python)
     venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
     return venv
   }
 
-  def run(String command) {
+  void run(String command) {
     script.sh("""
       . ${destDir}/bin/activate
       ${command}
