@@ -1,6 +1,7 @@
 package com.ableton
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
@@ -68,8 +69,7 @@ class VirtualEnvTest extends BasePipelineTest {
     VirtualEnv venv = new VirtualEnv(script, python)
     // Expect that the dirname of the python installation is stripped from the virtualenv
     // directory, but that it still retains the correct python version.
-    // The current implementation of the VirtualEnv ctor does not handle this case
-    // assertFalse(venv.destDir.contains('usr/bin'))
+    assertFalse(venv.destDir.contains('usr/bin'))
     assertTrue(venv.destDir.endsWith('python3.5'))
   }
 

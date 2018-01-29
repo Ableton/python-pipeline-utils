@@ -22,7 +22,7 @@ class VirtualEnv implements Serializable {
       pathSep +
       script.env.BUILD_NUMBER +
       pathSep +
-      python
+      python.split(pathSep).last()
   }
 
   @SuppressWarnings('MethodParameterTypeRequired')
