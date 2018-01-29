@@ -13,6 +13,7 @@ import org.junit.Test
  * Tests for the VirtualEnv class.
  */
 class VirtualEnvTest extends BasePipelineTest {
+  @SuppressWarnings('FieldTypeRequired')
   def script
 
   @Override
@@ -31,7 +32,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObject() throws Exception {
-    def venv = new VirtualEnv(script, 'python2.7')
+    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.destDir)
@@ -39,7 +40,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWithNullScript() throws Exception {
-    def exceptionThrown = false
+    boolean exceptionThrown = false
     try {
       new VirtualEnv(null, 'python2.7')
     } catch (AssertionError error) {
@@ -51,7 +52,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWithNullPython() throws Exception {
-    def exceptionThrown = false
+    boolean exceptionThrown = false
     try {
       new VirtualEnv(script, null)
     } catch (AssertionError error) {
@@ -64,10 +65,10 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   @SuppressWarnings('BuilderMethodWithSideEffects')
   void create() throws Exception {
-    def python = 'python2.7'
-    def venv = new VirtualEnv(script, python)
+    String python = 'python2.7'
+    VirtualEnv venv = new VirtualEnv(script, python)
     JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
-    def createdVenv = VirtualEnv.create(script, python)
+    VirtualEnv createdVenv = VirtualEnv.create(script, python)
     assertEquals(venv.destDir, createdVenv.destDir)
   }
 }

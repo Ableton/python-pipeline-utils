@@ -1,6 +1,7 @@
 import com.ableton.VirtualEnv
 
 
-def create(script, String python) {
+@SuppressWarnings('MethodParameterTypeRequired')
+VirtualEnv create(def script, String python) {
   return VirtualEnv.create(script, python)
 }
