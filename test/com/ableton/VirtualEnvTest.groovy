@@ -63,6 +63,17 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void newObjectWithAbsolutePath() throws Exception {
+    String python = '/usr/bin/python3.5'
+    VirtualEnv venv = new VirtualEnv(script, python)
+    // Expect that the dirname of the python installation is stripped from the virtualenv
+    // directory, but that it still retains the correct python version.
+    // The current implementation of the VirtualEnv ctor does not handle this case
+    // assertFalse(venv.destDir.contains('usr/bin'))
+    assertTrue(venv.destDir.endsWith('python3.5'))
+  }
+
+  @Test
   @SuppressWarnings('BuilderMethodWithSideEffects')
   void create() throws Exception {
     String python = 'python2.7'
