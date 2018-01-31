@@ -53,21 +53,26 @@ class PythonBuilder implements Serializable {
     return script.pwd(tmp: true)
   }
 
+  protected String buildDir() {
+    return tempDir() + '/python-build'
+  }
+
   protected String download() {
-    String downloadUrl = downloadMirror + '/' + version +
-      '/' + pythonBaseName() + '.tgz'
-    String outputFile = script.pwd(tmp: true) + '/' + pythonBaseName() + '.tgz'
+    String downloadUrl = downloadMirror + '/' + version + '/' + pythonBaseName() + '.tgz'
+    String outputFile = buildDir() + '/' + pythonBaseName() + '.tgz'
     script.echo 'Downloading python from: ' + downloadUrl
 
-    switch (downloadWith) {
-      case 'curl':
-        script.sh "curl -s -o ${outputFile} ${downloadUrl}"
-        break
-      case 'httpRequest':
-        script.httpRequest(outputFile: outputFile, url: downloadUrl)
-        break
-      default:
-        script.error 'Unknown downloadWith type: ' + downloadWith
+    script.dir(buildDir()) {
+      switch (downloadWith) {
+        case 'curl':
+          script.sh "curl -s -o ${outputFile} ${downloadUrl}"
+          break
+        case 'httpRequest':
+          script.httpRequest(outputFile: outputFile, url: downloadUrl)
+          break
+        default:
+          script.error 'Unknown downloadWith type: ' + downloadWith
+      }
     }
 
     return outputFile
@@ -75,10 +80,10 @@ class PythonBuilder implements Serializable {
 
   protected String extract(String sourcesTarball) {
     script.echo 'Extracting python sources'
-    script.dir(tempDir()) {
+    script.dir(buildDir()) {
       script.sh 'tar xfz ' + sourcesTarball
     }
-    return tempDir() + '/' + pythonBaseName()
+    return buildDir() + '/' + pythonBaseName()
   }
 
   protected String build(String sourcesPath) {
@@ -87,9 +92,9 @@ class PythonBuilder implements Serializable {
     if (!makeJobs || !makeJobs.toInteger()) {
       throw new IllegalArgumentException('Invalid argument for makeJobs: ' + makeJobs)
     }
-
     script.echo 'Building python from: ' + sourcesPath
-    String installPath = script.pwd(tmp: true) + '/' + pythonBaseName()
+
+    String installPath = tempDir() + '/' + pythonBaseName()
     script.dir(sourcesPath) {
       script.sh './configure --prefix=' + installPath
       script.sh 'make -j' + makeJobs

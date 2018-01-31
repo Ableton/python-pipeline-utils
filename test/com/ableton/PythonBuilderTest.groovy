@@ -33,8 +33,9 @@ class PythonBuilderTest extends BasePipelineTest {
   @Test
   void install() throws Exception {
     PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
+    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
     String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + pythonPath + '.tgz', '', 0)
+    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
     JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
     JenkinsMocks.addShMock('make -j1', '', 0)
     JenkinsMocks.addShMock('make install', '', 0)
@@ -44,8 +45,9 @@ class PythonBuilderTest extends BasePipelineTest {
   @Test(expected = Exception)
   void installWithBuildError() throws Exception {
     PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
+    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
     String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + pythonPath + '.tgz', '', 0)
+    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
     JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
     JenkinsMocks.addShMock('make -j1', '', 1)
     pb.install()
@@ -89,8 +91,8 @@ class PythonBuilderTest extends BasePipelineTest {
   @Test(expected = NumberFormatException)
   void installWithInvalidMakeJobs() throws Exception {
     PythonBuilder pb = new PythonBuilder(script: script, version: '1', makeJobs: 'X')
-    String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + pythonPath + '.tgz', '', 0)
+    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
+    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
     pb.install()
   }
 
