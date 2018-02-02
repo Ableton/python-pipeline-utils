@@ -9,8 +9,11 @@ runTheBuilds.runDevToolsProject(script: this,
         groovylint.check('./Jenkinsfile,**/*.gradle,**/*.groovy')
       },
       junit: {
-        sh './gradlew test'
-        junit 'build/test-results/**/*.xml'
+        try {
+          sh './gradlew test'
+        } finally {
+          junit 'build/test-results/**/*.xml'
+        }
       },
     )
   },
