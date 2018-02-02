@@ -1,43 +1,28 @@
 @SuppressWarnings('VariableTypeRequired') // For the declaration of the _ variable
-@Library(['ableton-utils@0.1.0', 'groovylint@0.2.0']) _
+@Library(['ableton-utils@0.3.0', 'groovylint@0.3.0']) _
+
+final String BRANCH = "${env.HEAD_REF}".replace('origin/', '').replace('refs/heads/', '')
+library "python-utils@${BRANCH}"
 
 
-void addStages() {
-  runTheBuilds.timedStage('Checkout') {
-    // Print out all environment variables for debugging purposes
-    sh 'env'
-    checkout scm
-  }
-
-  runTheBuilds.timedStage('Test') {
+runTheBuilds.runDevToolsProject(script: this,
+  setup: {
+    @SuppressWarnings('VariableTypeRequired')
+    def venv = virtualenv.create('python3.6')
+    echo "venv is ${venv.getClass().toString()}"
+  },
+  test: {
     parallel(failFast: false,
       groovylint: {
         groovylint.check('./Jenkinsfile,**/*.gradle,**/*.groovy')
       },
       junit: {
-        sh './gradlew test'
-        junit 'build/test-results/**/*.xml'
+        try {
+          sh './gradlew test'
+        } finally {
+          junit 'build/test-results/**/*.xml'
+        }
       },
     )
-  }
-}
-
-
-runTheBuilds.runForSpecificBranches(runTheBuilds.COMMON_BRANCH_FILTERS, true) {
-  node('generic-linux') {
-    try {
-      runTheBuilds.report('pending', env.CALLBACK_URL)
-      addStages()
-      runTheBuilds.report('success', env.CALLBACK_URL)
-    } catch (error) {
-      runTheBuilds.report('failure', env.CALLBACK_URL)
-      throw error
-    } finally {
-      stage('Cleanup') {
-        dir(env.WORKSPACE) {
-          deleteDir()
-        }
-      }
-    }
-  }
-}
+  },
+)
