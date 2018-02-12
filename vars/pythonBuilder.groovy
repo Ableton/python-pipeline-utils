@@ -1,6 +1,7 @@
 import com.ableton.PythonBuilder
 
 
-String install(Map args) {
-  return new PythonBuilder(args).install()
+String install(Map arguments) {
+  arguments['script'] = this
+  return new PythonBuilder(arguments).install()
 }
