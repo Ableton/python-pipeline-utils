@@ -1,6 +1,6 @@
 import com.ableton.PythonBuilder
 
 
-String install(Map args) {
-  return new PythonBuilder(args).install()
+String install(Map arguments) {
+  return new PythonBuilder(arguments).install()
 }
