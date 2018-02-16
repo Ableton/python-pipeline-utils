@@ -27,6 +27,9 @@ class PythonBuilderTest extends BasePipelineTest {
       registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
       registerAllowedMethod('pwd', [Map], JenkinsMocks.pwd)
       registerAllowedMethod('sh', [String], JenkinsMocks.sh)
+      registerAllowedMethod('withEnv', [List, Closure]) { vars, body ->
+        body()
+      }
     }
   }
 
@@ -94,6 +97,21 @@ class PythonBuilderTest extends BasePipelineTest {
     String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
     JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
     pb.install()
+  }
+
+  @Test
+  void getBuildEnv() throws Exception {
+    PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
+    assertEquals([], pb.buildEnv())
+  }
+
+  @Test
+  void getBuildEnvWithCcache() throws Exception {
+    PythonBuilder pb = new PythonBuilder(
+      script: script, version: '1.0.0', ccachePath: '/opt/ccache/bin')
+    script.env = [PATH: '/bin']
+    assertEquals(1, pb.buildEnv().size())
+    assertEquals('PATH=/opt/ccache/bin:/bin', pb.buildEnv()[0].toString())
   }
 
   @Test
