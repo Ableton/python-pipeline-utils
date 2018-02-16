@@ -10,6 +10,11 @@ class PythonBuilder implements Serializable {
   String version = null
 
   /**
+   * Specifies the path for the ccache executable, which will be prepended to the PATH
+   * when building Python.
+   */
+  String ccachePath = null
+  /**
    * Mirror to use when downloading Python.
    */
   String downloadMirror = 'https://www.python.org/ftp/python'
@@ -96,11 +101,17 @@ class PythonBuilder implements Serializable {
 
     String installPath = tempDir() + '/' + pythonBaseName()
     script.dir(sourcesPath) {
-      script.sh './configure --prefix=' + installPath
-      script.sh 'make -j' + makeJobs
-      script.sh 'make install'
+      script.withEnv(buildEnv()) {
+        script.sh './configure --prefix=' + installPath
+        script.sh 'make -j' + makeJobs
+        script.sh 'make install'
+      }
       script.deleteDir()
     }
     return installPath
+  }
+
+  protected List<String> buildEnv() {
+    return ccachePath ? ["PATH=${ccachePath}:${script.env.PATH}"] : []
   }
 }
