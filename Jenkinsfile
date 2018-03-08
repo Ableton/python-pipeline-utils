@@ -1,5 +1,8 @@
 @SuppressWarnings('VariableTypeRequired') // For the declaration of the _ variable
-@Library(['ableton-utils@0.6.4', 'groovylint@0.3.0']) _
+@Library([
+  'ableton-utils@0.8',
+  'groovylint@0.3.0',
+]) _
 
 
 runTheBuilds.runDevToolsProject(
@@ -16,5 +19,12 @@ runTheBuilds.runDevToolsProject(
         }
       },
     )
+  },
+  deploy: {
+    runTheBuilds.runForSpecificBranches(['master'], false) {
+      String versionNumber = readFile('VERSION').trim()
+      version.tag(versionNumber)
+      version.forwardMinorBranch(versionNumber)
+    }
   },
 )
