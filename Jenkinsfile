@@ -1,6 +1,6 @@
 @SuppressWarnings('VariableTypeRequired') // For the declaration of the _ variable
 @Library([
-  'ableton-utils@0.6.4',
+  'ableton-utils@0.8',
   'groovylint@0.3.0',
 ]) _
 
