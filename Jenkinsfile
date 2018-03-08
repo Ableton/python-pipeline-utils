@@ -20,4 +20,11 @@ runTheBuilds.runDevToolsProject(
       },
     )
   },
+  deploy: {
+    runTheBuilds.runForSpecificBranches(['master'], false) {
+      String versionNumber = readFile('VERSION').trim()
+      version.tag(versionNumber)
+      version.forwardMinorBranch(versionNumber)
+    }
+  },
 )
