@@ -1,7 +1,15 @@
 package com.ableton
 
 
+/**
+ * Class to download, build, and install custom Python versions. This can be useful for
+ * testing against very recent Python versions for which no package yet exists.
+ */
 class PythonBuilder implements Serializable {
+  /**
+   * Script context.
+   * <strong>Required value, may not be nulL!</strong>
+   */
   @SuppressWarnings('FieldTypeRequired')
   def script = null
   /**
@@ -36,6 +44,11 @@ class PythonBuilder implements Serializable {
    */
   String revision = ''
 
+  /**
+   * Download, compile, and install Python using values in the fields of this class.
+   * @return Path to Python installation directory. The actual Python executable will be
+   *         found in the {@code bin} subdirectory of this path.
+   */
   String install() {
     // Sanity check required values
     assert script
