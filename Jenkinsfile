@@ -6,8 +6,11 @@
 
 
 runTheBuilds.runDevToolsProject(
-  test: {
+  test: { data ->
     parallel(failFast: false,
+      groovydoc: {
+        data['docs'] = groovydoc.generate()
+      },
       groovylint: {
         groovylint.check('./Jenkinsfile,**/*.gradle,**/*.groovy')
       },
@@ -20,11 +23,18 @@ runTheBuilds.runDevToolsProject(
       },
     )
   },
-  deploy: {
+  deploy: { data ->
     runTheBuilds.runForSpecificBranches(['master'], false) {
-      String versionNumber = readFile('VERSION').trim()
-      version.tag(versionNumber)
-      version.forwardMinorBranch(versionNumber)
+      parallel(failFast: false,
+        groovydoc: {
+          docs.publish(data['docs'], 'AbletonDevTools/ableton-pipeline-utils')
+        },
+        version: {
+          String versionNumber = readFile('VERSION').trim()
+          version.tag(versionNumber)
+          version.forwardMinorBranch(versionNumber)
+        },
+      )
     }
   },
 )
