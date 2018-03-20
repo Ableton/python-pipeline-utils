@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-  compile 'com.github.AbletonDevTools:jenkins-pipeline-mocks:0.4.1'
+  compile 'com.github.AbletonDevTools:jenkins-pipeline-mocks:0.7+'
   compile 'org.codehaus.groovy:groovy-all:2.4.10'
 
   testCompile 'junit:junit:4.12'
