@@ -8,7 +8,7 @@ package com.ableton
 class PythonBuilder implements Serializable {
   /**
    * Script context.
-   * <strong>Required value, may not be nulL!</strong>
+   * <strong>Required value, may not be null!</strong>
    */
   @SuppressWarnings('FieldTypeRequired')
   def script = null

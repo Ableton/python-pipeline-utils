@@ -8,7 +8,7 @@ package com.ableton
 class VirtualEnvList implements Serializable {
   /**
    * Script context.
-   * <strong>Required value, may not be nulL!</strong>
+   * <strong>Required value, may not be null!</strong>
    */
   @SuppressWarnings('FieldTypeRequired')
   def script
@@ -34,6 +34,16 @@ class VirtualEnvList implements Serializable {
   void run(String command) {
     venvs.each { venv ->
       venv.run(command)
+    }
+  }
+
+  /**
+   * Cleanup all Virtualenv files on disk. You should call this method in the cleanup
+   * stage of the pipeline to avoid cluttering the build node with temporary files.
+   */
+  void cleanup() {
+    venvs.each { venv ->
+      venv.cleanup()
     }
   }
 }

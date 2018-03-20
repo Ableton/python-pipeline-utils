@@ -26,8 +26,9 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(script)
     script.env = ['BUILD_NUMBER': 1]
 
+    helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
+    helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
-    helper.registerAllowedMethod('pwd', [Map], JenkinsMocks.pwd)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
   }
 
@@ -81,5 +82,11 @@ class VirtualEnvTest extends BasePipelineTest {
     JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python)
     assertEquals(venv.destDir, createdVenv.destDir)
+  }
+
+  @Test
+  void cleanup() throws Exception {
+    VirtualEnv venv = new VirtualEnv(script, 'python3.6')
+    venv.cleanup()
   }
 }
