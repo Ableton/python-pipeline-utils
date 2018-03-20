@@ -29,7 +29,6 @@ class VirtualEnvTest extends BasePipelineTest {
     helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
     helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
-    helper.registerAllowedMethod('pwd', [Map], JenkinsMocks.pwd)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
   }
 

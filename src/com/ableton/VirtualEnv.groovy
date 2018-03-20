@@ -3,7 +3,7 @@ package com.ableton
 
 /**
  * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
- * stored in the job's temporary directory and is unique for each build number.
+ * stored under the system temporary directory is unique for each build number.
  */
 class VirtualEnv implements Serializable {
   /**
@@ -14,7 +14,7 @@ class VirtualEnv implements Serializable {
   def script
   /**
    * Destination directory for the virtualenv. This value is set during construction of
-   * the object, and is under the job's temporary working directory.
+   * the object, and is under the system temporary directory.
    */
   String destDir
 
@@ -35,7 +35,10 @@ class VirtualEnv implements Serializable {
     this.script = script
 
     String pathSep = script.isUnix() ? '/' : '\\'
-    this.destDir = script.pwd(tmp: true) +
+    String tempDir = script.isUnix() ? '/tmp' : script.env.TEMP
+    this.destDir = tempDir +
+      pathSep +
+      script.env.JOB_BASE_NAME +
       pathSep +
       script.env.BUILD_NUMBER +
       pathSep +
