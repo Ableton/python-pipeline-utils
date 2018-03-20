@@ -8,7 +8,7 @@ package com.ableton
 class VirtualEnv implements Serializable {
   /**
    * Script context.
-   * <strong>Required value, may not be nulL!</strong>
+   * <strong>Required value, may not be null!</strong>
    */
   @SuppressWarnings('FieldTypeRequired')
   def script
@@ -23,7 +23,7 @@ class VirtualEnv implements Serializable {
    * initialize the environment by running {@code virtualenv}. Use the factory method
    * {@link #create(Object, String)} instead.
    * @param script Script context.
-   *               <strong>Required value, may not be nulL!</strong>
+   *               <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
    * @see #create(Object, String)
    */
@@ -45,7 +45,7 @@ class VirtualEnv implements Serializable {
   /**
    * Factory method to create new class instance and properly initialize it.
    * @param script Script context.
-   *               <strong>Required value, may not be nulL!</strong>
+   *               <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
    * @return New instance of VirtualEnv object.
    */
