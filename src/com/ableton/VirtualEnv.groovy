@@ -66,4 +66,14 @@ class VirtualEnv implements Serializable {
       ${command}
     """)
   }
+
+  /**
+   * Removes the Virtualenv from disk. You should call this method in the cleanup stage
+   * of the pipeline to avoid cluttering the build node with temporary files.
+   */
+  void cleanup() {
+    script.dir(destDir) {
+      script.deleteDir()
+    }
+  }
 }
