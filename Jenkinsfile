@@ -12,7 +12,7 @@ runTheBuilds.runDevToolsProject(
         data['docs'] = groovydoc.generate()
       },
       groovylint: {
-        groovylint.check('./Jenkinsfile,**/*.gradle,**/*.groovy')
+        groovylint.check('./Jenkinsfile,./*.gradle,**/*.groovy')
       },
       junit: {
         try {
