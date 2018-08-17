@@ -1,5 +1,5 @@
 @Library([
-  'ableton-utils@0.8',
+  'ableton-utils@0.10',
   'groovylint@0.4',
 ]) _
 
@@ -23,7 +23,7 @@ runTheBuilds.runDevToolsProject(
     )
   },
   deploy: { data ->
-    runTheBuilds.runForSpecificBranches(['master'], false) {
+    runTheBuilds.withBranches(branches: ['master'], acceptPullRequests: false) {
       parallel(failFast: false,
         groovydoc: {
           docs.publish(data['docs'], 'AbletonDevTools/python-pipeline-utils')
