@@ -34,7 +34,7 @@ class VirtualEnv implements Serializable {
 
     this.script = script
 
-    String pathSep = script.isUnix() ? '/' : '\\'
+    String pathSep = script.isUnix() ? '/' : '\\\\'
     String tempDir = script.isUnix() ? '/tmp' : script.env.TEMP
     this.destDir = tempDir +
       pathSep +

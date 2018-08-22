@@ -9,8 +9,6 @@ import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.Before
 import org.junit.Test
 
-import java.util.regex.PatternSyntaxException
-
 
 /**
  * Tests for the VirtualEnv class.
@@ -45,7 +43,7 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv.destDir)
   }
 
-  @Test(expected = PatternSyntaxException)
+  @Test
   void newObjectWindows() throws Exception {
     helper.registerAllowedMethod('isUnix', []) {
       return false
