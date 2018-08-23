@@ -33,7 +33,21 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObject() throws Exception {
+  void newObjectUnix() throws Exception {
+    helper.registerAllowedMethod('isUnix', []) {
+      return true
+    }
+    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+    assertNotNull(venv)
+    assertNotNull(venv.script)
+    assertNotNull(venv.destDir)
+  }
+
+  @Test
+  void newObjectWindows() throws Exception {
+    helper.registerAllowedMethod('isUnix', []) {
+      return false
+    }
     VirtualEnv venv = new VirtualEnv(script, 'python2.7')
     assertNotNull(venv)
     assertNotNull(venv.script)
