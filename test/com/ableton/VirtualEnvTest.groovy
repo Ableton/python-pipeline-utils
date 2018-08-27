@@ -89,7 +89,6 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  @SuppressWarnings('BuilderMethodWithSideEffects')
   void create() throws Exception {
     String python = 'python2.7'
     VirtualEnv venv = new VirtualEnv(script, python)
