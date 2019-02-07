@@ -36,7 +36,7 @@ class PipenvTest extends BasePipelineTest {
   void runWith() throws Exception {
     List pythonVersions = ['2.7', '3.5']
     pythonVersions.each { python ->
-      JenkinsMocks.addShMock("pipenv install --dev --python ${python}", '', 0)
+      JenkinsMocks.addShMock("pipenv sync --dev --python ${python}", '', 0)
     }
 
     int numCalls = 0
@@ -45,12 +45,12 @@ class PipenvTest extends BasePipelineTest {
       return p
     }
 
-    // Ensure that pipenv install was called for each Python version
+    // Ensure that pipenv sync was called for each Python version
     pythonVersions.each { python ->
       assertTrue(helper.callStack.findAll { call ->
         call.methodName == 'sh'
       }.any { call ->
-        callArgsToString(call).contains("pipenv install --dev --python ${python}")
+        callArgsToString(call).contains("pipenv sync --dev --python ${python}")
       })
     }
 
