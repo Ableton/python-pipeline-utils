@@ -18,7 +18,7 @@ class Pipenv implements Serializable {
    * parallelized and therefore the commands are run serially for each Python version.
    *
    * This function also installs the development packages for each Python version (in
-   * other words, it runs {@code pipenv install --dev}. Also, it removes the virtualenv
+   * other words, it runs {@code pipenv sync --dev}. Also, it removes the virtualenv
    * after the last Python version has been run.
    *
    * @param pythonVersions List of Python versions to run the command with. This argument
@@ -38,7 +38,7 @@ class Pipenv implements Serializable {
 
     try {
       pythonVersions.each { python ->
-        script.sh "pipenv install --dev --python ${python}"
+        script.sh "pipenv sync --dev --python ${python}"
         results[python] = body(python)
       }
     } finally {
