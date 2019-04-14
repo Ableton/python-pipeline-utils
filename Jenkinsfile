@@ -1,3 +1,8 @@
+// TODO: when the old job has been retired, remove this block.
+if (env.HEAD_REF || env.BASE_REF) {
+  return
+}
+
 library 'ableton-utils@0.11'
 library 'groovylint@0.4'
 
