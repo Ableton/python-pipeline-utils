@@ -1,7 +1,5 @@
-@Library([
-  'ableton-utils@0.11',
-  'groovylint@0.4',
-]) _
+library 'ableton-utils@0.11'
+library 'groovylint@0.4'
 
 
 runTheBuilds.runDevToolsProject(
