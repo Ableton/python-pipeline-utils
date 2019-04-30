@@ -25,18 +25,14 @@ devToolsProject.run(
       },
     )
   },
+  publish: { data ->
+    docs.publish(data['docs'], 'AbletonDevTools/python-pipeline-utils')
+  },
   deploy: { data ->
     if (runTheBuilds.isPushTo(['master'])) {
-      parallel(failFast: false,
-        groovydoc: {
-          docs.publish(data['docs'], 'AbletonDevTools/python-pipeline-utils')
-        },
-        version: {
-          String versionNumber = readFile('VERSION').trim()
-          version.tag(versionNumber)
-          version.forwardMinorBranch(versionNumber)
-        },
-      )
+      String versionNumber = readFile('VERSION').trim()
+      version.tag(versionNumber)
+      version.forwardMinorBranch(versionNumber)
     }
   },
 )
