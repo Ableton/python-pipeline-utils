@@ -3,7 +3,7 @@ if (env.HEAD_REF || env.BASE_REF) {
   return
 }
 
-library 'ableton-utils@0.12'
+library 'ableton-utils@0.13'
 library 'groovylint@0.6'
 
 
