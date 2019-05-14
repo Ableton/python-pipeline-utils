@@ -3,7 +3,7 @@ if (env.HEAD_REF || env.BASE_REF) {
   return
 }
 
-library 'ableton-utils@0.12'
+library 'ableton-utils@0.13'
 library 'groovylint@0.6'
 
 
@@ -28,11 +28,10 @@ devToolsProject.run(
   publish: { data ->
     docs.publish(data['docs'], 'AbletonDevTools/python-pipeline-utils')
   },
+  deployWhen: { return runTheBuilds.isPushTo(['master']) },
   deploy: { data ->
-    if (runTheBuilds.isPushTo(['master'])) {
-      String versionNumber = readFile('VERSION').trim()
-      version.tag(versionNumber)
-      version.forwardMinorBranch(versionNumber)
-    }
+    String versionNumber = readFile('VERSION').trim()
+    version.tag(versionNumber)
+    version.forwardMinorBranch(versionNumber)
   },
 )
