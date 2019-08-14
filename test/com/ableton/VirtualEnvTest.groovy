@@ -38,7 +38,9 @@ class VirtualEnvTest extends BasePipelineTest {
       helper.registerAllowedMethod('isUnix', []) {
         return true
       }
+
       VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+
       assertNotNull(venv)
       assertNotNull(venv.script)
       assertNotNull(venv.destDir)
@@ -52,7 +54,9 @@ class VirtualEnvTest extends BasePipelineTest {
       helper.registerAllowedMethod('isUnix', []) {
         return false
       }
+
       VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+
       assertNotNull(venv)
       assertNotNull(venv.script)
       assertNotNull(venv.destDir)
@@ -87,7 +91,9 @@ class VirtualEnvTest extends BasePipelineTest {
   void newObjectWithAbsolutePath() throws Exception {
     if (JenkinsMocks.isUnix()) {
       String python = '/usr/bin/python3.5'
+
       VirtualEnv venv = new VirtualEnv(script, python)
+
       // Expect that the dirname of the python installation is stripped from the
       // virtualenv directory, but that it still retains the correct python version.
       assertFalse(venv.destDir.contains('usr/bin'))
@@ -100,7 +106,9 @@ class VirtualEnvTest extends BasePipelineTest {
     if (!JenkinsMocks.isUnix()) {
       script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
       String python = '/c/Python27/python'
+
       VirtualEnv venv = new VirtualEnv(script, python)
+
       assertFalse(venv.destDir.startsWith('/c'))
       assertTrue(venv.destDir.endsWith('python'))
     }
@@ -110,7 +118,9 @@ class VirtualEnvTest extends BasePipelineTest {
   void create() throws Exception {
     script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = 'python2.7'
+
     VirtualEnv venv = new VirtualEnv(script, python)
+
     JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python)
     assertEquals(venv.destDir, createdVenv.destDir)
@@ -119,7 +129,9 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void cleanup() throws Exception {
     script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
+
     VirtualEnv venv = new VirtualEnv(script, 'python3.6')
+
     venv.cleanup()
   }
 }
