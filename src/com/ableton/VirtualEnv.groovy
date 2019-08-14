@@ -18,6 +18,8 @@ class VirtualEnv implements Serializable {
    */
   String destDir
 
+  protected String activateSubDir
+
   /**
    * Factory method to create new class instance and properly initialize it.
    *
@@ -53,7 +55,10 @@ class VirtualEnv implements Serializable {
     this.script = script
 
     String tempDir = '/tmp'
-    if (!script.isUnix()) {
+    if (script.isUnix()) {
+      activateSubDir = 'bin'
+    } else {
+      activateSubDir = 'Scripts'
       List tempDirParts = script.env.TEMP.split(':')
       tempDir = "/${tempDirParts[0]}${tempDirParts[1].replace('\\', '/')}"
     }
@@ -79,7 +84,7 @@ class VirtualEnv implements Serializable {
    */
   void run(String command) {
     script.sh("""
-      . ${destDir}/bin/activate
+      . ${destDir}/${activateSubDir}/activate
       ${command}
     """)
   }
