@@ -40,7 +40,9 @@ class VirtualEnv implements Serializable {
    *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
-   * @param python Python version or absolute path to Python executable.
+   * @param python Python version or absolute path to Python executable. On Windows, this
+   *               should be a Cygwin-style path, but <strong>without the {@code .exe}
+   *               extension</strong>, for example: {@code /c/Python27/python}
    * @see #create(Object, String)
    */
   @SuppressWarnings('MethodParameterTypeRequired')
@@ -50,15 +52,14 @@ class VirtualEnv implements Serializable {
 
     this.script = script
 
-    String pathSep = script.isUnix() ? '/' : '\\\\'
-    String tempDir = script.isUnix() ? '/tmp' : script.env.TEMP
-    this.destDir = tempDir +
-      pathSep +
-      script.env.JOB_BASE_NAME +
-      pathSep +
-      script.env.BUILD_NUMBER +
-      pathSep +
-      python.split(pathSep).last()
+    String tempDir = '/tmp'
+    if (!script.isUnix()) {
+      List tempDirParts = script.env.TEMP.split(':')
+      tempDir = "/${tempDirParts[0]}${tempDirParts[1].replace('\\', '/')}"
+    }
+
+    this.destDir = "${tempDir}/${script.env.JOB_BASE_NAME}/${script.env.BUILD_NUMBER}/" +
+      python.split('/').last()
   }
 
   /**

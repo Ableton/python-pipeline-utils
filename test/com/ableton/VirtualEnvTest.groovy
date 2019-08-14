@@ -99,10 +99,10 @@ class VirtualEnvTest extends BasePipelineTest {
   void newObjectWithAbsolutePathWindows() throws Exception {
     if (!JenkinsMocks.isUnix()) {
       script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-      String python = 'C:\\Python27\\python.exe'
+      String python = '/c/Python27/python'
       VirtualEnv venv = new VirtualEnv(script, python)
-      assertFalse(venv.destDir.startsWith('C:\\'))
-      assertTrue(venv.destDir.endsWith('python.exe'))
+      assertFalse(venv.destDir.startsWith('/c'))
+      assertTrue(venv.destDir.endsWith('python'))
     }
   }
 
