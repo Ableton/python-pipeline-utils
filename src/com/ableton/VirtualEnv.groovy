@@ -37,6 +37,7 @@ class VirtualEnv implements Serializable {
    * Construct a new instance of this class. This method <strong>does not</strong>
    * initialize the environment by running {@code virtualenv}. Use the factory method
    * {@link #create(Object, String)} instead.
+   *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
@@ -72,6 +73,7 @@ class VirtualEnv implements Serializable {
 
   /**
    * Run a command in the virtualenv.
+   *
    * @param command Command to run.
    */
   void run(String command) {
