@@ -19,6 +19,21 @@ class VirtualEnv implements Serializable {
   String destDir
 
   /**
+   * Factory method to create new class instance and properly initialize it.
+   *
+   * @param script Script context.
+   *               <strong>Required value, may not be null!</strong>
+   * @param python Python version or absolute path to Python executable.
+   * @return New instance of VirtualEnv object.
+   */
+  @SuppressWarnings('MethodParameterTypeRequired')
+  static VirtualEnv create(def script, String python) {
+    VirtualEnv venv = new VirtualEnv(script, python)
+    venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
+    return venv
+  }
+
+  /**
    * Construct a new instance of this class. This method <strong>does not</strong>
    * initialize the environment by running {@code virtualenv}. Use the factory method
    * {@link #create(Object, String)} instead.
@@ -46,17 +61,13 @@ class VirtualEnv implements Serializable {
   }
 
   /**
-   * Factory method to create new class instance and properly initialize it.
-   * @param script Script context.
-   *               <strong>Required value, may not be null!</strong>
-   * @param python Python version or absolute path to Python executable.
-   * @return New instance of VirtualEnv object.
+   * Removes the Virtualenv from disk. You should call this method in the cleanup stage
+   * of the pipeline to avoid cluttering the build node with temporary files.
    */
-  @SuppressWarnings('MethodParameterTypeRequired')
-  static VirtualEnv create(def script, String python) {
-    VirtualEnv venv = new VirtualEnv(script, python)
-    venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
-    return venv
+  void cleanup() {
+    script.dir(destDir) {
+      script.deleteDir()
+    }
   }
 
   /**
@@ -68,15 +79,5 @@ class VirtualEnv implements Serializable {
       . ${destDir}/bin/activate
       ${command}
     """)
-  }
-
-  /**
-   * Removes the Virtualenv from disk. You should call this method in the cleanup stage
-   * of the pipeline to avoid cluttering the build node with temporary files.
-   */
-  void cleanup() {
-    script.dir(destDir) {
-      script.deleteDir()
-    }
   }
 }
