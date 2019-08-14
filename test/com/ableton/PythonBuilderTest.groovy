@@ -35,25 +35,40 @@ class PythonBuilderTest extends BasePipelineTest {
 
   @Test
   void install() throws Exception {
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
-    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
-    String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
-    JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
-    JenkinsMocks.addShMock('make -j1', '', 0)
-    JenkinsMocks.addShMock('make install', '', 0)
-    assertEquals(pythonPath, pb.install())
+    if (JenkinsMocks.isUnix()) {
+      PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
+      String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
+      String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
+      JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
+      JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
+      JenkinsMocks.addShMock('make -j1', '', 0)
+      JenkinsMocks.addShMock('make install', '', 0)
+      assertEquals(pythonPath, pb.install())
+    }
+  }
+
+  @Test(expected = UnsupportedOperationException)
+  void installWindows() throws Exception {
+    if (JenkinsMocks.isUnix()) {
+      throw new UnsupportedOperationException()
+    } else {
+      new PythonBuilder(script: script, version: '1.0.0').install()
+    }
   }
 
   @Test(expected = Exception)
   void installWithBuildError() throws Exception {
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
-    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
-    String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
-    JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
-    JenkinsMocks.addShMock('make -j1', '', 1)
-    pb.install()
+    if (JenkinsMocks.isUnix()) {
+      PythonBuilder pb = new PythonBuilder(script: script, version: '1.0.0')
+      String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
+      String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
+      JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
+      JenkinsMocks.addShMock('./configure --prefix=' + pythonPath, '', 0)
+      JenkinsMocks.addShMock('make -j1', '', 1)
+      pb.install()
+    } else {
+      throw new UnsupportedOperationException()
+    }
   }
 
   @Test(expected = AssertionError)
@@ -70,33 +85,53 @@ class PythonBuilderTest extends BasePipelineTest {
 
   @Test(expected = ConnectException)
   void installWithDownloadError() throws Exception {
-    helper.registerAllowedMethod('httpRequest', [Map]) {
+    if (JenkinsMocks.isUnix()) {
+      helper.registerAllowedMethod('httpRequest', [Map]) {
+        throw new ConnectException()
+      }
+      PythonBuilder pb = new PythonBuilder(script: script, version: '1')
+      pb.install()
+    } else {
       throw new ConnectException()
     }
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1')
-    pb.install()
   }
 
   @Test(expected = Exception)
   void installWithInvalidDownloadWith() throws Exception {
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1', downloadWith: 'X')
-    pb.install()
+    if (JenkinsMocks.isUnix()) {
+      PythonBuilder pb = new PythonBuilder(
+        script: script,
+        version: '1',
+        downloadWith: 'X',
+      )
+      pb.install()
+    } else {
+      throw new UnsupportedOperationException()
+    }
   }
 
   @Test(expected = IllegalArgumentException)
   void installWithEmptyMakeJobs() throws Exception {
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1', makeJobs: '')
-    String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + pythonPath + '.tgz', '', 0)
-    pb.install()
+    if (JenkinsMocks.isUnix()) {
+      PythonBuilder pb = new PythonBuilder(script: script, version: '1', makeJobs: '')
+      String pythonPath = pb.tempDir() + '/' + pb.pythonBaseName()
+      JenkinsMocks.addShMock('tar xfz ' + pythonPath + '.tgz', '', 0)
+      pb.install()
+    } else {
+      throw new IllegalArgumentException()
+    }
   }
 
   @Test(expected = NumberFormatException)
   void installWithInvalidMakeJobs() throws Exception {
-    PythonBuilder pb = new PythonBuilder(script: script, version: '1', makeJobs: 'X')
-    String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
-    JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
-    pb.install()
+    if (JenkinsMocks.isUnix()) {
+      PythonBuilder pb = new PythonBuilder(script: script, version: '1', makeJobs: 'X')
+      String sourcesPath = pb.buildDir() + '/' + pb.pythonBaseName()
+      JenkinsMocks.addShMock('tar xfz ' + sourcesPath + '.tgz', '', 0)
+      pb.install()
+    } else {
+      throw new NumberFormatException()
+    }
   }
 
   @Test
