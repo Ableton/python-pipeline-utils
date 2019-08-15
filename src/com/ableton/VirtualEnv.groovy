@@ -18,35 +18,11 @@ class VirtualEnv implements Serializable {
    */
   String destDir
 
-  /**
-   * Construct a new instance of this class. This method <strong>does not</strong>
-   * initialize the environment by running {@code virtualenv}. Use the factory method
-   * {@link #create(Object, String)} instead.
-   * @param script Script context.
-   *               <strong>Required value, may not be null!</strong>
-   * @param python Python version or absolute path to Python executable.
-   * @see #create(Object, String)
-   */
-  @SuppressWarnings('MethodParameterTypeRequired')
-  VirtualEnv(def script, String python) {
-    assert script
-    assert python
-
-    this.script = script
-
-    String pathSep = script.isUnix() ? '/' : '\\\\'
-    String tempDir = script.isUnix() ? '/tmp' : script.env.TEMP
-    this.destDir = tempDir +
-      pathSep +
-      script.env.JOB_BASE_NAME +
-      pathSep +
-      script.env.BUILD_NUMBER +
-      pathSep +
-      python.split(pathSep).last()
-  }
+  protected String activateSubDir
 
   /**
    * Factory method to create new class instance and properly initialize it.
+   *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
@@ -60,14 +36,35 @@ class VirtualEnv implements Serializable {
   }
 
   /**
-   * Run a command in the virtualenv.
-   * @param command Command to run.
+   * Construct a new instance of this class. This method <strong>does not</strong>
+   * initialize the environment by running {@code virtualenv}. Use the factory method
+   * {@link #create(Object, String)} instead.
+   *
+   * @param script Script context.
+   *               <strong>Required value, may not be null!</strong>
+   * @param python Python version or absolute path to Python executable. On Windows, this
+   *               should be a Cygwin-style path, but <strong>without the {@code .exe}
+   *               extension</strong>, for example: {@code /c/Python27/python}
+   * @see #create(Object, String)
    */
-  void run(String command) {
-    script.sh("""
-      . ${destDir}/bin/activate
-      ${command}
-    """)
+  @SuppressWarnings('MethodParameterTypeRequired')
+  VirtualEnv(def script, String python) {
+    assert script
+    assert python
+
+    this.script = script
+
+    String tempDir = '/tmp'
+    if (script.isUnix()) {
+      activateSubDir = 'bin'
+    } else {
+      activateSubDir = 'Scripts'
+      List tempDirParts = script.env.TEMP.split(':')
+      tempDir = "/${tempDirParts[0]}${tempDirParts[1].replace('\\', '/')}"
+    }
+
+    this.destDir = "${tempDir}/${script.env.JOB_BASE_NAME}/${script.env.BUILD_NUMBER}/" +
+      python.split('/').last()
   }
 
   /**
@@ -78,5 +75,17 @@ class VirtualEnv implements Serializable {
     script.dir(destDir) {
       script.deleteDir()
     }
+  }
+
+  /**
+   * Run a command in the virtualenv.
+   *
+   * @param command Command to run.
+   */
+  void run(String command) {
+    script.sh("""
+      . ${destDir}/${activateSubDir}/activate
+      ${command}
+    """)
   }
 }
