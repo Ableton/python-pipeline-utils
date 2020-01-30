@@ -14,8 +14,7 @@ import org.junit.Test
  * Tests for the VirtualEnv class.
  */
 class VirtualEnvTest extends BasePipelineTest {
-  @SuppressWarnings('FieldTypeRequired')
-  def script
+  Object script
 
   @Override
   @Before

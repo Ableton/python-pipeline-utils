@@ -22,7 +22,7 @@ The `virtualenv` singleton creates a Python Virtualenv in the project's temporar
 Example usage might look something like this:
 
 ```groovy
-def venv
+Object venv
 
 stage('Setup') {
   venv = virtualenv.create(this, 'python3.6')
