@@ -10,8 +10,7 @@ class VirtualEnvList implements Serializable {
    * Script context.
    * <strong>Required value, may not be null!</strong>
    */
-  @SuppressWarnings('FieldTypeRequired')
-  def script
+  Object script
   /**
    * List of {@link com.ableton.VirtualEnv} objects.
    * @see #add(String)

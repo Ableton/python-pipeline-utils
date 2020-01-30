@@ -9,8 +9,7 @@ class Pipenv implements Serializable {
    * Script context.
    * <strong>Required value, may not be null!</strong>
    */
-  @SuppressWarnings('FieldTypeRequired')
-  def script
+  Object script
 
   /**
    * Run a closure with Pipenv using multiple versions of Python. Because the virtualenv

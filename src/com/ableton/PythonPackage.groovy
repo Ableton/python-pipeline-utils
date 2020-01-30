@@ -9,8 +9,7 @@ class PythonPackage implements Serializable {
    * Script context.
    * <strong>Required value, may not be null!</strong>
    */
-  @SuppressWarnings('FieldTypeRequired')
-  def script = null
+  Object script = null
 
   /**
    * Start of the line setting the Python package version.

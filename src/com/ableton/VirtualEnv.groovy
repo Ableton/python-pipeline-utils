@@ -10,8 +10,7 @@ class VirtualEnv implements Serializable {
    * Script context.
    * <strong>Required value, may not be null!</strong>
    */
-  @SuppressWarnings('FieldTypeRequired')
-  def script
+  Object script
   /**
    * Destination directory for the virtualenv. This value is set during construction of
    * the object, and is under the system temporary directory.
@@ -28,8 +27,7 @@ class VirtualEnv implements Serializable {
    * @param python Python version or absolute path to Python executable.
    * @return New instance of VirtualEnv object.
    */
-  @SuppressWarnings('MethodParameterTypeRequired')
-  static VirtualEnv create(def script, String python) {
+  static VirtualEnv create(Object script, String python) {
     VirtualEnv venv = new VirtualEnv(script, python)
     venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
     return venv
@@ -47,8 +45,7 @@ class VirtualEnv implements Serializable {
    *               extension</strong>, for example: {@code /c/Python27/python}
    * @see #create(Object, String)
    */
-  @SuppressWarnings('MethodParameterTypeRequired')
-  VirtualEnv(def script, String python) {
+  VirtualEnv(Object script, String python) {
     assert script
     assert python
 
