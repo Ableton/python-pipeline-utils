@@ -15,12 +15,59 @@ class VirtualEnv implements Serializable {
    * Destination directory for the virtualenv. This value is set during construction of
    * the object, and is under the system temporary directory.
    */
-  String destDir
+  String destDir = null
+  /**
+   * Series of commands needed to activate a virtualenv inside the
+   * current shell.
+   */
+  String activateCommands = null
 
-  protected String activateSubDir
+  protected String activateSubDir = null
 
   /**
-   * Factory method to create new class instance and properly initialize it.
+   * Create a virtualenv using a specific version of Python, installed via pyenv. pyenv
+   * should be installed on the node, but the actual setup of any required environment
+   * variables (e.g. PYENV_ROOT and PATH) will be done inside this function.
+   *
+   * @param script Script context.
+   *               <strong>Required value, may not be null!</strong>
+   * @param python Python version, as given by pyenv versions --list.
+   * @param pyenvRoot Path to the installation of pyenv.
+   * @return New instance of VirtualEnv object.
+   */
+  static VirtualEnv create(Object script, String python, String pyenvRoot) {
+    if (!script.isUnix()) {
+      script.error 'This method is not supported on Windows'
+    }
+
+    VirtualEnv venv = new VirtualEnv(script, python)
+    assert pyenvRoot
+
+    if (!script.fileExists(pyenvRoot)) {
+      script.error "pyenv root path '${pyenvRoot}' does not exist"
+    }
+
+    venv.activateCommands = """
+      export PYENV_ROOT=${pyenvRoot}
+      export PATH=\$PYENV_ROOT/bin:\$PATH
+      eval "\$(pyenv init -)"
+    """
+
+    venv.script.sh("""
+      ${venv.activateCommands}
+      pyenv install --skip-existing ${python}
+      pyenv shell ${python}
+      pip install virtualenv
+      virtualenv ${venv.destDir}
+    """)
+
+    venv.activateCommands += ". ${venv.destDir}/${venv.activateSubDir}/activate"
+
+    return venv
+  }
+
+  /**
+   * Create a virtualenv using a specific locally installed version of Python.
    *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
@@ -62,6 +109,8 @@ class VirtualEnv implements Serializable {
 
     this.destDir = "${tempDir}/${script.env.JOB_BASE_NAME}/${script.env.BUILD_NUMBER}/" +
       python.split('/').last()
+
+    this.activateCommands = ". ${destDir}/${activateSubDir}/activate"
   }
 
   /**
@@ -81,7 +130,7 @@ class VirtualEnv implements Serializable {
    */
   void run(String command) {
     script.sh("""
-      . ${destDir}/${activateSubDir}/activate
+      ${this.activateCommands}
       ${command}
     """)
   }

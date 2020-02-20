@@ -23,10 +23,11 @@ class VirtualEnvTest extends BasePipelineTest {
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
-    script.env = ['BUILD_NUMBER': 1]
+    script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
 
     helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
     helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
+    helper.registerAllowedMethod('error', [String], JenkinsMocks.error)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
   }
@@ -123,6 +124,55 @@ class VirtualEnvTest extends BasePipelineTest {
     JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python)
     assertEquals(venv.destDir, createdVenv.destDir)
+  }
+
+  @Test
+  void createPyenv() throws Exception {
+    String pythonVersion = '1.2.3'
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.registerAllowedMethod('fileExists', [String]) { return true }
+    helper.registerAllowedMethod('isUnix', []) { return true }
+    // Note: This empty string allows us to compensate for trailing whitespace, which is
+    // needed to match the string given to the sh mock.
+    String empty = ''
+    JenkinsMocks.addShMock("""
+      ${empty}
+      export PYENV_ROOT=${pyenvRoot}
+      export PATH=\$PYENV_ROOT/bin:\$PATH
+      eval "\$(pyenv init -)"
+    ${empty}
+      pyenv install --skip-existing ${pythonVersion}
+      pyenv shell ${pythonVersion}
+      pip install virtualenv
+      virtualenv /tmp/mock/1/${pythonVersion}
+    """, '', 0)
+
+    VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
+
+    assertTrue(venv.activateCommands.contains(pyenvRoot))
+  }
+
+  @Test(expected = Exception)
+  void createPyenvInvalidRoot() throws Exception {
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.registerAllowedMethod('fileExists', [String]) { return false }
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    VirtualEnv.create(script, '1.2.3', pyenvRoot)
+  }
+
+  @Test(expected = Exception)
+  void createPyenvWindows() throws Exception {
+    helper.registerAllowedMethod('isUnix', []) { return false }
+
+    VirtualEnv.create(script, '1.2.3', 'C:\\pyenv')
+  }
+
+  @Test(expected = AssertionError)
+  void createPyenvNoRoot() throws Exception {
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    VirtualEnv.create(script, '1.2.3', null)
   }
 
   @Test
