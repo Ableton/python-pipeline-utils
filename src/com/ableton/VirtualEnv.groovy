@@ -98,24 +98,19 @@ class VirtualEnv implements Serializable {
 
     this.script = script
 
-    String tempDir = '/tmp'
     if (script.isUnix()) {
       activateSubDir = 'bin'
     } else {
       activateSubDir = 'Scripts'
-      List tempDirParts = script.env.TEMP.split(':')
-      tempDir = "/${tempDirParts[0]}${tempDirParts[1].replace('\\', '/')}"
     }
 
-    this.destDir = "${tempDir}/${script.env.JOB_BASE_NAME}/${script.env.BUILD_NUMBER}/" +
-      python.split('/').last()
+    this.destDir = "${script.pwd(tmp: true)}/virtualenvs/${python.split('/').last()}"
 
     this.activateCommands = ". ${destDir}/${activateSubDir}/activate"
   }
 
   /**
-   * Removes the virtualenv from disk. You should call this method in the cleanup stage
-   * of the pipeline to avoid cluttering the build node with temporary files.
+   * Removes the virtualenv from disk.
    */
   void cleanup() {
     script.dir(destDir) {

@@ -23,10 +23,10 @@ class VirtualEnvTest extends BasePipelineTest {
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
-    script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
 
     helper.registerAllowedMethod('error', [String], JenkinsMocks.error)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
+    helper.registerAllowedMethod('pwd', [Map], JenkinsMocks.pwd)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
   }
 
@@ -48,7 +48,6 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void newObjectWindows() throws Exception {
     if (!JenkinsMocks.isUnix()) {
-      script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
       helper.registerAllowedMethod('isUnix', []) {
         return false
       }
@@ -102,7 +101,6 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void newObjectWithAbsolutePathWindows() throws Exception {
     if (!JenkinsMocks.isUnix()) {
-      script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
       String python = '/c/Python27/python'
 
       VirtualEnv venv = new VirtualEnv(script, python)
@@ -114,7 +112,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void create() throws Exception {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = 'python2.7'
 
     VirtualEnv venv = new VirtualEnv(script, python)
@@ -130,6 +127,7 @@ class VirtualEnvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
+    helper.registerAllowedMethod('pwd', [Map]) { return '/tmp' }
     // Note: This empty string allows us to compensate for trailing whitespace, which is
     // needed to match the string given to the sh mock.
     String empty = ''
@@ -142,7 +140,7 @@ class VirtualEnvTest extends BasePipelineTest {
       pyenv install --skip-existing ${pythonVersion}
       pyenv shell ${pythonVersion}
       pip install virtualenv
-      virtualenv /tmp/mock/1/${pythonVersion}
+      virtualenv /tmp/virtualenvs/${pythonVersion}
     """, '', 0)
 
     VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
@@ -175,8 +173,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void cleanup() throws Exception {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-
     helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
     helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
 
