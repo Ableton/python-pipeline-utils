@@ -25,8 +25,6 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(script)
     script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
 
-    helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
-    helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
     helper.registerAllowedMethod('error', [String], JenkinsMocks.error)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
@@ -178,6 +176,9 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void cleanup() throws Exception {
     script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
+
+    helper.registerAllowedMethod('deleteDir', [], JenkinsMocks.deleteDir)
+    helper.registerAllowedMethod('dir', [String], JenkinsMocks.dir)
 
     VirtualEnv venv = new VirtualEnv(script, 'python3.6')
 
