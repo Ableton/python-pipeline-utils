@@ -2,7 +2,7 @@ package com.ableton
 
 
 /**
- * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
+ * Provides a minimal wrapper around a Python virtualenv environment. The virtualenv is
  * stored under the system temporary directory is unique for each build number.
  */
 class VirtualEnv implements Serializable {
@@ -114,7 +114,7 @@ class VirtualEnv implements Serializable {
   }
 
   /**
-   * Removes the Virtualenv from disk. You should call this method in the cleanup stage
+   * Removes the virtualenv from disk. You should call this method in the cleanup stage
    * of the pipeline to avoid cluttering the build node with temporary files.
    */
   void cleanup() {
