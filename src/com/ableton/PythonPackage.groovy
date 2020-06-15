@@ -61,5 +61,6 @@ class PythonPackage implements Serializable {
     }
 
     script.error("No ${versionLineBeginning} found in ${args.filename}")
+    return null
   }
 }
