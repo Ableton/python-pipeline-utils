@@ -27,6 +27,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
     helper.registerAllowedMethod('error', [String], JenkinsMocks.error)
     helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
+    helper.registerAllowedMethod('sh', [Map], JenkinsMocks.sh)
     helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
   }
 
@@ -196,5 +197,57 @@ class VirtualEnvTest extends BasePipelineTest {
     assertEquals(1, helper.callStack.findAll { call ->
       call.methodName == 'sh'
     }.size())
+  }
+
+  @Test
+  void runWithMap() {
+    String mockScriptCall = '''
+      . /tmp/mock/1/python/bin/activate
+      mock-script
+    '''
+    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    new VirtualEnv(script, 'python').run(script: 'mock-script')
+
+    assertEquals(1, helper.callStack.findAll { call ->
+      call.methodName == 'sh'
+    }.size())
+  }
+
+  @Test
+  void runWithMapReturnStatus() {
+    String mockScriptCall = '''
+      . /tmp/mock/1/python/bin/activate
+      mock-script
+    '''
+    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 1234)
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    int result = new VirtualEnv(script, 'python')
+      .run(script: 'mock-script', returnStatus: true)
+
+    assertEquals(1, helper.callStack.findAll { call ->
+      call.methodName == 'sh'
+    }.size())
+    assertEquals(1234, result)
+  }
+
+  @Test
+  void runWithMapReturnStdout() {
+    String mockScriptCall = '''
+      . /tmp/mock/1/python/bin/activate
+      mock-script
+    '''
+    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    String result = new VirtualEnv(script, 'python')
+      .run(script: 'mock-script', returnStdout: true)
+
+    assertEquals(1, helper.callStack.findAll { call ->
+      call.methodName == 'sh'
+    }.size())
+    assertEquals('mock output', result)
   }
 }
