@@ -18,7 +18,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Override
   @Before
-  void setUp() throws Exception {
+  void setUp() {
     super.setUp()
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
@@ -31,7 +31,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void cleanup() throws Exception {
+  void cleanup() {
     script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
 
     VirtualEnv venv = new VirtualEnv(script, 'python3.6')
@@ -40,7 +40,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void create() throws Exception {
+  void create() {
     script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = 'python2.7'
 
@@ -52,7 +52,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void createPyenv() throws Exception {
+  void createPyenv() {
     String pythonVersion = '1.2.3'
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
@@ -78,7 +78,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test(expected = Exception)
-  void createPyenvInvalidRoot() throws Exception {
+  void createPyenvInvalidRoot() {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return false }
     helper.registerAllowedMethod('isUnix', []) { return true }
@@ -87,21 +87,21 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test(expected = AssertionError)
-  void createPyenvNoRoot() throws Exception {
+  void createPyenvNoRoot() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     VirtualEnv.create(script, '1.2.3', null)
   }
 
   @Test(expected = Exception)
-  void createPyenvWindows() throws Exception {
+  void createPyenvWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
 
     VirtualEnv.create(script, '1.2.3', 'C:\\pyenv')
   }
 
   @Test
-  void newObjectUnix() throws Exception {
+  void newObjectUnix() {
     if (JenkinsMocks.isUnix()) {
       helper.registerAllowedMethod('isUnix', []) {
         return true
@@ -116,7 +116,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObjectWindows() throws Exception {
+  void newObjectWindows() {
     if (!JenkinsMocks.isUnix()) {
       script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
       helper.registerAllowedMethod('isUnix', []) {
@@ -132,7 +132,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObjectWithAbsolutePath() throws Exception {
+  void newObjectWithAbsolutePath() {
     if (JenkinsMocks.isUnix()) {
       String python = '/usr/bin/python3.5'
 
@@ -146,7 +146,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObjectWithAbsolutePathWindows() throws Exception {
+  void newObjectWithAbsolutePathWindows() {
     if (!JenkinsMocks.isUnix()) {
       script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
       String python = '/c/Python27/python'
@@ -159,7 +159,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObjectWithNullPython() throws Exception {
+  void newObjectWithNullPython() {
     boolean exceptionThrown = false
     try {
       new VirtualEnv(script, null)
@@ -171,7 +171,7 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void newObjectWithNullScript() throws Exception {
+  void newObjectWithNullScript() {
     boolean exceptionThrown = false
     try {
       new VirtualEnv(null, 'python2.7')
