@@ -181,4 +181,20 @@ class VirtualEnvTest extends BasePipelineTest {
     }
     assertTrue(exceptionThrown)
   }
+
+  @Test
+  void run() {
+    String mockScriptCall = '''
+      . /tmp/mock/1/python/bin/activate
+      mock-script
+    '''
+    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    new VirtualEnv(script, 'python').run('mock-script')
+
+    assertEquals(1, helper.callStack.findAll { call ->
+      call.methodName == 'sh'
+    }.size())
+  }
 }
