@@ -126,6 +126,28 @@ class VirtualEnv implements Serializable {
   /**
    * Run a command in the virtualenv.
    *
+   * @param arguments Arguments to pass to the {@code sh} command. See the documentation
+   *        for the {@code sh} step for valid arguments.
+   */
+  @SuppressWarnings('MethodReturnTypeRequired')
+  def run(Map arguments) {
+    assert arguments
+    assert arguments.containsKey('script')
+
+    String scriptCommand = """
+      ${this.activateCommands}
+      ${arguments.script}
+    """
+    // We shouldn't modify the original arguments map
+    Map newArguments = arguments.clone()
+    // Replace the original `script` command with the venv-activated one
+    newArguments['script'] = scriptCommand
+    return script.sh(newArguments)
+  }
+
+  /**
+   * Run a command in the virtualenv.
+   *
    * @param command Command to run.
    */
   void run(String command) {
