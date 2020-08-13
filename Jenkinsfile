@@ -18,22 +18,6 @@ devToolsProject.run(
           junit 'build/test-results/**/*.xml'
         }
       },
-      'junit-win': {
-        eventRecorder.timedNode('generic-win') {
-          sh 'env' // Print out all environment variables for debugging purposes
-          gitRepo.checkoutRevision(
-            credentialsId: 'build-ssh-key',
-            revision: env.JENKINS_COMMIT,
-            url: "git@github.com:${env.JENKINS_REPO_SLUG}.git",
-          )
-
-          try {
-            bat 'gradlew.bat test'
-          } finally {
-            junit 'build/test-results/**/*.xml'
-          }
-        }
-      },
     )
   },
   publish: { data ->
