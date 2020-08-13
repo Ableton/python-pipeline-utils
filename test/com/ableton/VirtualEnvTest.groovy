@@ -18,6 +18,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Override
   @Before
+  @SuppressWarnings('ThrowException')
   void setUp() {
     super.setUp()
 
@@ -25,10 +26,9 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(script)
     script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
 
-    helper.registerAllowedMethod('error', [String], JenkinsMocks.error)
-    helper.registerAllowedMethod('isUnix', [], JenkinsMocks.isUnix)
-    helper.registerAllowedMethod('sh', [Map], JenkinsMocks.sh)
-    helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
+    helper.registerAllowedMethod('error', [String]) { message ->
+      throw new Exception(message)
+    }
   }
 
   @Test
@@ -47,7 +47,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
     VirtualEnv venv = new VirtualEnv(script, python)
 
-    JenkinsMocks.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
+    helper.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python)
     assertEquals(venv.destDir, createdVenv.destDir)
   }
@@ -61,7 +61,7 @@ class VirtualEnvTest extends BasePipelineTest {
     // Note: This empty string allows us to compensate for trailing whitespace, which is
     // needed to match the string given to the sh mock.
     String empty = ''
-    JenkinsMocks.addShMock("""
+    helper.addShMock("""
       ${empty}
       export PYENV_ROOT=${pyenvRoot}
       export PATH=\$PYENV_ROOT/bin:\$PATH
@@ -103,60 +103,50 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectUnix() {
-    if (JenkinsMocks.isUnix()) {
-      helper.registerAllowedMethod('isUnix', []) {
-        return true
-      }
+    helper.registerAllowedMethod('isUnix', []) { return true }
 
-      VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
 
-      assertNotNull(venv)
-      assertNotNull(venv.script)
-      assertNotNull(venv.destDir)
-    }
+    assertNotNull(venv)
+    assertNotNull(venv.script)
+    assertNotNull(venv.destDir)
   }
 
   @Test
   void newObjectWindows() {
-    if (!JenkinsMocks.isUnix()) {
-      script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-      helper.registerAllowedMethod('isUnix', []) {
-        return false
-      }
+    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
+    helper.registerAllowedMethod('isUnix', []) { return false }
 
-      VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
 
-      assertNotNull(venv)
-      assertNotNull(venv.script)
-      assertNotNull(venv.destDir)
-    }
+    assertNotNull(venv)
+    assertNotNull(venv.script)
+    assertNotNull(venv.destDir)
   }
 
   @Test
   void newObjectWithAbsolutePath() {
-    if (JenkinsMocks.isUnix()) {
-      String python = '/usr/bin/python3.5'
+    helper.registerAllowedMethod('isUnix', []) { return true }
+    String python = '/usr/bin/python3.5'
 
-      VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script, python)
 
-      // Expect that the dirname of the python installation is stripped from the
-      // virtualenv directory, but that it still retains the correct python version.
-      assertFalse(venv.destDir.contains('usr/bin'))
-      assertTrue(venv.destDir.endsWith('python3.5'))
-    }
+    // Expect that the dirname of the python installation is stripped from the
+    // virtualenv directory, but that it still retains the correct python version.
+    assertFalse(venv.destDir.contains('usr/bin'))
+    assertTrue(venv.destDir.endsWith('python3.5'))
   }
 
   @Test
   void newObjectWithAbsolutePathWindows() {
-    if (!JenkinsMocks.isUnix()) {
-      script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-      String python = '/c/Python27/python'
+    helper.registerAllowedMethod('isUnix', []) { return false }
+    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
+    String python = '/c/Python27/python'
 
-      VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script, python)
 
-      assertFalse(venv.destDir.startsWith('/c'))
-      assertTrue(venv.destDir.endsWith('python'))
-    }
+    assertFalse(venv.destDir.startsWith('/c'))
+    assertTrue(venv.destDir.endsWith('python'))
   }
 
   @Test
@@ -189,7 +179,7 @@ class VirtualEnvTest extends BasePipelineTest {
       . /tmp/mock/1/python/bin/activate
       mock-script
     '''
-    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     new VirtualEnv(script, 'python').run('mock-script')
@@ -205,7 +195,7 @@ class VirtualEnvTest extends BasePipelineTest {
       . /tmp/mock/1/python/bin/activate
       mock-script
     '''
-    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     new VirtualEnv(script, 'python').run(script: 'mock-script')
@@ -221,7 +211,7 @@ class VirtualEnvTest extends BasePipelineTest {
       . /tmp/mock/1/python/bin/activate
       mock-script
     '''
-    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 1234)
+    helper.addShMock(mockScriptCall, 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     int result = new VirtualEnv(script, 'python')
@@ -239,7 +229,7 @@ class VirtualEnvTest extends BasePipelineTest {
       . /tmp/mock/1/python/bin/activate
       mock-script
     '''
-    JenkinsMocks.addShMock(mockScriptCall, 'mock output', 0)
+    helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     String result = new VirtualEnv(script, 'python')

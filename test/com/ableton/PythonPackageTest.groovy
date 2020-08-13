@@ -24,9 +24,7 @@ class PythonPackageTest extends BasePipelineTest {
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
 
-    helper.registerAllowedMethod('readFile', [String], JenkinsMocks.readFile)
-
-    JenkinsMocks.addReadFileMock('__init__.py', '''
+    helper.addReadFileMock('__init__.py', '''
 # Copyright (c) 2018 Ableton AG, Berlin. All rights reserved.\n
 \n
 """gruberflask is designed to help you obtain $640 million in bearer bonds."""\n

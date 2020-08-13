@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -21,21 +20,15 @@ class PipenvTest extends BasePipelineTest {
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
-    helper.registerAllowedMethod('sh', [String], JenkinsMocks.sh)
 
-    JenkinsMocks.addShMock('pipenv --rm', '', 0)
-  }
-
-  @After
-  void tearDown() {
-    JenkinsMocks.clearStaticData()
+    helper.addShMock('pipenv --rm', '', 0)
   }
 
   @Test
   void runWith() throws Exception {
     List pythonVersions = ['2.7', '3.5']
     pythonVersions.each { python ->
-      JenkinsMocks.addShMock("pipenv sync --dev --python ${python}", '', 0)
+      helper.addShMock("pipenv sync --dev --python ${python}", '', 0)
     }
 
     int numCalls = 0
