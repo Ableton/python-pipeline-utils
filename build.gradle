@@ -14,14 +14,9 @@ dependencies {
   compile 'com.github.AbletonDevTools:jenkins-pipeline-mocks:0.8+'
   compile 'org.codehaus.groovy:groovy-all:2.4.12'
 
+  testCompile 'com.lesfurets:jenkins-pipeline-unit:1.4'
   testCompile 'org.assertj:assertj-core:3.15+'
   testCompile 'junit:junit:4.13'
-
-  testCompile(
-    group: 'com.lesfurets',
-    name: 'jenkins-pipeline-unit',
-    version: '1.4',
-  )
 }
 
 sourceSets {
