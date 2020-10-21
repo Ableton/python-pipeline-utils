@@ -53,13 +53,16 @@ class VirtualEnv implements Serializable {
       eval "\$(pyenv init -)"
     """
 
-    venv.script.sh("""
-      ${venv.activateCommands}
-      pyenv install --skip-existing ${python}
-      pyenv shell ${python}
-      pip install virtualenv
-      virtualenv ${venv.destDir}
-    """)
+    venv.script.sh(
+      label: "Install Python version ${python} with pipenv",
+      script: """
+        ${venv.activateCommands}
+        pyenv install --skip-existing ${python}
+        pyenv shell ${python}
+        pip install virtualenv
+        virtualenv ${venv.destDir}
+      """,
+    )
 
     venv.activateCommands += ". ${venv.destDir}/${venv.activateSubDir}/activate"
 
@@ -76,7 +79,10 @@ class VirtualEnv implements Serializable {
    */
   static VirtualEnv create(Object script, String python) {
     VirtualEnv venv = new VirtualEnv(script, python)
-    venv.script.sh("virtualenv --python=${python} ${venv.destDir}")
+    venv.script.sh(
+      label: "Create virtualenv for Python version ${python}",
+      script: "virtualenv --python=${python} ${venv.destDir}",
+    )
     return venv
   }
 
@@ -142,6 +148,7 @@ class VirtualEnv implements Serializable {
     Map newArguments = arguments.clone()
     // Replace the original `script` command with the venv-activated one
     newArguments['script'] = scriptCommand
+    newArguments['label'] = "Run command in virtualenv: ${arguments.script}"
     return script.sh(newArguments)
   }
 
@@ -151,9 +158,12 @@ class VirtualEnv implements Serializable {
    * @param command Command to run.
    */
   void run(String command) {
-    script.sh("""
-      ${this.activateCommands}
-      ${command}
-    """)
+    script.sh(
+      label: "Run command in virtualenv: ${command}",
+      script: """
+        ${this.activateCommands}
+        ${command}
+      """,
+    )
   }
 }

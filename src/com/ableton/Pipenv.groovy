@@ -37,12 +37,15 @@ class Pipenv implements Serializable {
 
     try {
       pythonVersions.each { python ->
-        script.sh "pipenv sync --dev --python ${python}"
+        script.sh(
+          label: 'Install pipenv packages',
+          script: "pipenv sync --dev --python ${python}",
+        )
         results[python] = body(python)
       }
     } finally {
       try {
-        script.sh 'pipenv --rm'
+        script.sh(label: 'Remove pipenv packages', script: 'pipenv --rm')
       } catch (ignored) {}
     }
 
