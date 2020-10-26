@@ -54,7 +54,7 @@ class VirtualEnv implements Serializable {
     """
 
     venv.script.sh(
-      label: "Install Python version ${python} with pipenv",
+      label: "Install Python version ${python} with pyenv",
       script: """
         ${venv.activateCommands}
         pyenv install --skip-existing ${python}
