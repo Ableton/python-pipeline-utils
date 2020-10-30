@@ -148,7 +148,8 @@ class VirtualEnv implements Serializable {
     Map newArguments = arguments.clone()
     // Replace the original `script` command with the venv-activated one
     newArguments['script'] = scriptCommand
-    newArguments['label'] = "Run command in virtualenv: ${arguments.script}"
+    newArguments['label'] = arguments.label ?:
+      "Run command in virtualenv: ${arguments.script}"
     return script.sh(newArguments)
   }
 
