@@ -1,12 +1,13 @@
+---
 version: 2
 updates:
-- package-ecosystem: gradle
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 3
-  ignore:
-  - dependency-name: org.codehaus.groovy:groovy-all
-    versions:
-    # This is the version of Groovy that ships with Jenkins 2.x
-    - "> 2.4.12"
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 1
+    ignore:
+      - dependency-name: org.codehaus.groovy:groovy-all
+        versions:
+          # This is the version of Groovy that ships with Jenkins 2.x
+          - "> 2.4.12"
