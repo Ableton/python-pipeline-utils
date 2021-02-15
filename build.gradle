@@ -11,7 +11,7 @@ dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.4.12'
 
   testCompile 'com.lesfurets:jenkins-pipeline-unit:1.8'
-  testCompile 'junit:junit:4.13.1'
+  testCompile 'junit:junit:4.13.2'
 }
 
 sourceSets {
