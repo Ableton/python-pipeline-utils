@@ -24,7 +24,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
-    script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
+    script.env = ['WORKSPACE': '/workspace']
 
     helper.registerAllowedMethod('error', [String]) { message ->
       throw new Exception(message)
@@ -33,8 +33,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void cleanup() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-
     VirtualEnv venv = new VirtualEnv(script, 'python3.6')
 
     venv.cleanup()
@@ -42,7 +40,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void create() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = 'python2.7'
 
     VirtualEnv venv = new VirtualEnv(script, python)
@@ -70,7 +67,7 @@ class VirtualEnvTest extends BasePipelineTest {
       pyenv install --skip-existing ${pythonVersion}
       pyenv shell ${pythonVersion}
       pip install virtualenv
-      virtualenv /tmp/mock/1/${pythonVersion}
+      virtualenv /workspace/${pythonVersion}
     """, '', 0)
 
     VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
@@ -114,7 +111,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWindows() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     helper.registerAllowedMethod('isUnix', []) { return false }
 
     VirtualEnv venv = new VirtualEnv(script, 'python2.7')
@@ -140,7 +136,6 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void newObjectWithAbsolutePathWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = '/c/Python27/python'
 
     VirtualEnv venv = new VirtualEnv(script, python)
@@ -176,7 +171,7 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void run() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
@@ -192,7 +187,7 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMap() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
@@ -208,7 +203,7 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStatus() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 1234)
@@ -226,7 +221,7 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStdout() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)

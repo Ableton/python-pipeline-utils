@@ -8,7 +8,9 @@ working with Python.
 
 The easiest way to use this library in your Jenkins pipeline scripts is to add it to your
 Jenkins configuration. See the [Jenkins shared library usage
-documentation][jenkins-shared-lib-usage] for more information.
+documentation][jenkins-shared-lib-usage] for more information. Please note that this
+library may not work with the GitHub Organization plugin, since it creates workspace
+directories that exceed the shebang limit of 128 characters.
 
 
 ## Singletons
