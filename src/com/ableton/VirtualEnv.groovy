@@ -103,12 +103,7 @@ class VirtualEnv implements Serializable {
 
     this.script = script
 
-    if (script.isUnix()) {
-      activateSubDir = 'bin'
-    } else {
-      activateSubDir = 'Scripts'
-    }
-
+    activateSubDir = script.isUnix() ? 'bin' : 'Scripts'
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
     this.destDir = "${script.env.WORKSPACE}/.venv/venv-${randomName(seed)}"
     this.activateCommands = ". ${destDir}/${activateSubDir}/activate"
