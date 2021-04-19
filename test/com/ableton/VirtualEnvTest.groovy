@@ -24,7 +24,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
     this.script = loadScript('test/resources/EmptyPipeline.groovy')
     assertNotNull(script)
-    script.env = ['BUILD_NUMBER': 1, 'JOB_BASE_NAME': 'mock']
+    script.env = ['WORKSPACE': '/workspace']
 
     helper.registerAllowedMethod('error', [String]) { message ->
       throw new Exception(message)
@@ -33,22 +33,19 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void cleanup() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-
-    VirtualEnv venv = new VirtualEnv(script, 'python3.6')
+    VirtualEnv venv = new VirtualEnv(script)
 
     venv.cleanup()
   }
 
   @Test
   void create() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     String python = 'python2.7'
 
-    VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script, 1)
 
     helper.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
-    VirtualEnv createdVenv = VirtualEnv.create(script, python)
+    VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
     assertEquals(venv.destDir, createdVenv.destDir)
   }
 
@@ -70,7 +67,7 @@ class VirtualEnvTest extends BasePipelineTest {
       pyenv install --skip-existing ${pythonVersion}
       pyenv shell ${pythonVersion}
       pip install virtualenv
-      virtualenv /tmp/mock/1/${pythonVersion}
+      virtualenv /workspace/${pythonVersion}
     """, '', 0)
 
     VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
@@ -105,7 +102,7 @@ class VirtualEnvTest extends BasePipelineTest {
   void newObjectUnix() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+    VirtualEnv venv = new VirtualEnv(script)
 
     assertNotNull(venv)
     assertNotNull(venv.script)
@@ -114,10 +111,9 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWindows() {
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
     helper.registerAllowedMethod('isUnix', []) { return false }
 
-    VirtualEnv venv = new VirtualEnv(script, 'python2.7')
+    VirtualEnv venv = new VirtualEnv(script)
 
     assertNotNull(venv)
     assertNotNull(venv.script)
@@ -127,45 +123,30 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void newObjectWithAbsolutePath() {
     helper.registerAllowedMethod('isUnix', []) { return true }
-    String python = '/usr/bin/python3.5'
 
-    VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script, 1)
 
     // Expect that the dirname of the python installation is stripped from the
     // virtualenv directory, but that it still retains the correct python version.
     assertFalse(venv.destDir.contains('usr/bin'))
-    assertTrue(venv.destDir.endsWith('python3.5'))
+    assertTrue(venv.destDir.endsWith('venv-58734446'))
   }
 
   @Test
   void newObjectWithAbsolutePathWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
-    script.env['TEMP'] = 'C:\\Users\\whatever\\AppData\\Temp'
-    String python = '/c/Python27/python'
 
-    VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script, 1)
 
     assertFalse(venv.destDir.startsWith('/c'))
-    assertTrue(venv.destDir.endsWith('python'))
-  }
-
-  @Test
-  void newObjectWithNullPython() {
-    boolean exceptionThrown = false
-    try {
-      new VirtualEnv(script, null)
-    } catch (AssertionError error) {
-      exceptionThrown = true
-      assertNotNull(error)
-    }
-    assertTrue(exceptionThrown)
+    assertTrue(venv.destDir.endsWith('venv-58734446'))
   }
 
   @Test
   void newObjectWithNullScript() {
     boolean exceptionThrown = false
     try {
-      new VirtualEnv(null, 'python2.7')
+      new VirtualEnv(null)
     } catch (AssertionError error) {
       exceptionThrown = true
       assertNotNull(error)
@@ -174,15 +155,20 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void randomName() {
+    assertEquals('58734446', VirtualEnv.randomName(1))
+  }
+
+  @Test
   void run() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    new VirtualEnv(script, 'python').run('mock-script')
+    new VirtualEnv(script, 1).run('mock-script')
 
     assertEquals(1, helper.callStack.findAll { call ->
       call.methodName == 'sh'
@@ -192,13 +178,13 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMap() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/python/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    new VirtualEnv(script, 'python').run(script: 'mock-script')
+    new VirtualEnv(script, 1).run(script: 'mock-script')
 
     assertEquals(1, helper.callStack.findAll { call ->
       call.methodName == 'sh'
@@ -208,14 +194,13 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStatus() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/venv-58734446/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    int result = new VirtualEnv(script, 'python')
-      .run(script: 'mock-script', returnStatus: true)
+    int result = new VirtualEnv(script, 1).run(script: 'mock-script', returnStatus: true)
 
     assertEquals(1, helper.callStack.findAll { call ->
       call.methodName == 'sh'
@@ -226,13 +211,13 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStdout() {
     String mockScriptCall = '''
-      . /tmp/mock/1/python/bin/activate
+      . /workspace/.venv/venv-58734446/bin/activate
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    String result = new VirtualEnv(script, 'python')
+    String result = new VirtualEnv(script, 1)
       .run(script: 'mock-script', returnStdout: true)
 
     assertEquals(1, helper.callStack.findAll { call ->

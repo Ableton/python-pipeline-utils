@@ -37,8 +37,10 @@ class VirtualEnvList implements Serializable {
   }
 
   /**
-   * Cleanup all Virtualenv files on disk. You should call this method in the cleanup
-   * stage of the pipeline to avoid cluttering the build node with temporary files.
+   * Cleanup all Virtualenv files on disk. You can call this method in the cleanup stage
+   * of the pipeline to avoid cluttering the build node with temporary files. Note that
+   * the virtualenv is stored underneath the workspace, so removing the workspace will
+   * have the same effect.
    */
   void cleanup() {
     venvs.each { venv ->

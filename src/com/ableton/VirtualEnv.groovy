@@ -1,5 +1,7 @@
 package com.ableton
 
+import com.cloudbees.groovy.cps.NonCPS
+
 
 /**
  * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
@@ -40,7 +42,7 @@ class VirtualEnv implements Serializable {
       script.error 'This method is not supported on Windows'
     }
 
-    VirtualEnv venv = new VirtualEnv(script, python)
+    VirtualEnv venv = new VirtualEnv(script)
     assert pyenvRoot
 
     if (!script.fileExists(pyenvRoot)) {
@@ -75,10 +77,11 @@ class VirtualEnv implements Serializable {
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
+   * @param randomSeed If non-zero, use this seed for the random number generator.
    * @return New instance of VirtualEnv object.
    */
-  static VirtualEnv create(Object script, String python) {
-    VirtualEnv venv = new VirtualEnv(script, python)
+  static VirtualEnv create(Object script, String python, long randomSeed = 0) {
+    VirtualEnv venv = new VirtualEnv(script, randomSeed)
     venv.script.sh(
       label: "Create virtualenv for ${python}",
       script: "virtualenv --python=${python} ${venv.destDir}",
@@ -91,37 +94,26 @@ class VirtualEnv implements Serializable {
    * initialize the environment by running {@code virtualenv}. Use the factory method
    * {@link #create(Object, String)} instead.
    *
-   * @param script Script context.
-   *               <strong>Required value, may not be null!</strong>
-   * @param python Python version or absolute path to Python executable. On Windows, this
-   *               should be a Cygwin-style path, but <strong>without the {@code .exe}
-   *               extension</strong>, for example: {@code /c/Python27/python}
+   * @param script Script context. <strong>Required value, may not be null!</strong>
+   * @param randomSeed If non-zero, use this seed for the random number generator.
    * @see #create(Object, String)
    */
-  VirtualEnv(Object script, String python) {
+  VirtualEnv(Object script, long randomSeed = 0) {
     assert script
-    assert python
 
     this.script = script
 
-    String tempDir = '/tmp'
-    if (script.isUnix()) {
-      activateSubDir = 'bin'
-    } else {
-      activateSubDir = 'Scripts'
-      List tempDirParts = script.env.TEMP.split(':')
-      tempDir = "/${tempDirParts[0]}${tempDirParts[1].replace('\\', '/')}"
-    }
-
-    this.destDir = "${tempDir}/${script.env.JOB_BASE_NAME}/${script.env.BUILD_NUMBER}/" +
-      python.split('/').last()
-
+    activateSubDir = script.isUnix() ? 'bin' : 'Scripts'
+    long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
+    this.destDir = "${script.env.WORKSPACE}/.venv/venv-${randomName(seed)}"
     this.activateCommands = ". ${destDir}/${activateSubDir}/activate"
   }
 
   /**
-   * Removes the Virtualenv from disk. You should call this method in the cleanup stage
-   * of the pipeline to avoid cluttering the build node with temporary files.
+   * Removes the Virtualenv from disk. You can call this method in the cleanup stage of
+   * the pipeline to avoid cluttering the build node with temporary files. Note that the
+   * virtualenv is stored underneath the workspace, so removing the workspace will have
+   * the same effect.
    */
   void cleanup() {
     script.dir(destDir) {
@@ -166,5 +158,17 @@ class VirtualEnv implements Serializable {
         ${command}
       """,
     )
+  }
+
+  @NonCPS
+  protected static String randomName(long seed) {
+    String pool = '0123456789'
+    int length = 8
+    @SuppressWarnings('InsecureRandom')
+    Random random = new Random(seed)
+    List randomChars = (0..length - 1).collect {
+      pool[random.nextInt(pool.size())]
+    }
+    return randomChars.join('')
   }
 }
