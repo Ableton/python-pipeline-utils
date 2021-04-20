@@ -47,5 +47,13 @@ This library uses the [JenkinsPipelineUnit][jenkins-pipeline-unit] framework for
 testing. The unit tests can be run locally with `./gradlew test`.
 
 
+## Maintainers
+
+This project is maintained by the following GitHub users:
+
+- [@ala-ableton](https://github.com/ala-ableton)
+- [@nre-ableton](https://github.com/nre-ableton)
+
+
 [jenkins-pipeline-unit]: https://github.com/jenkinsci/JenkinsPipelineUnit
 [jenkins-shared-lib-usage]: https://jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries
