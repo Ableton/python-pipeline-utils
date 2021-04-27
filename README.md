@@ -18,6 +18,30 @@ directories that exceed the shebang limit of 128 characters.
 This library contains singleton wrappers for the classes so that the `Jenkinsfile` can be
 a bit less verbose.
 
+
+### `pipenv`
+
+The `pipenv` singleton runs a closure using [`pipenv`](pipenv) for a list of Python
+versions. Unlike the `virtualenv` singleton, it automatically installs packages from the
+`pipenv` lockfile with `pipenv sync --dev --python`.
+
+```groovy
+pipenv.runWith(['python3.6', 'python3.7', 'python3.8']) { python ->
+  sh(label: "Running unit tests with ${python}", script: 'pytest .')
+}
+```
+
+
+### `pythonPackage`
+
+The `pythonPackage` singleton parses the version number from a package, returning it as a
+string.
+
+```groovy
+String version = pythonPackage.readVersion(filename: 'mypackage/__init__.py')
+```
+
+
 ### `virtualenv`
 
 The `virtualenv` singleton creates a Python Virtualenv in the project's temporary folder.
@@ -32,8 +56,20 @@ stage('Setup') {
 }
 
 stage('Test') {
-  venv.run('pytest .')
+  venv.run(label: 'Run unit tests', script: 'pytest .')
 }
+```
+
+
+### `virtualenvs`
+
+This singleton is similar to `virtualenv`, but is a list of `virtualenv` objects. It is
+intended to make testing code with multiple Python versions easier.
+
+```groovy
+Object venvs = virtualenvs.create(['python3.6', 'python3.7', 'python3.8'])
+venvs.run('pip install -r requirements.txt')
+venvs.run('pytest .')
 ```
 
 
@@ -57,3 +93,4 @@ This project is maintained by the following GitHub users:
 
 [jenkins-pipeline-unit]: https://github.com/jenkinsci/JenkinsPipelineUnit
 [jenkins-shared-lib-usage]: https://jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries
+[pipenv]: https://pypi.org/project/pipenv/
