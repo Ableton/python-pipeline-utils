@@ -102,22 +102,25 @@ class VirtualEnvTest extends BasePipelineTest {
   void newObjectUnix() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    VirtualEnv venv = new VirtualEnv(script)
+    VirtualEnv venv = new VirtualEnv(script, 1)
 
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.destDir)
+    assertEquals('/workspace/.venv/venv-58734446', venv.destDir)
   }
 
   @Test
   void newObjectWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
+    script.env.WORKSPACE = 'C:\\workspace'
 
-    VirtualEnv venv = new VirtualEnv(script)
+    VirtualEnv venv = new VirtualEnv(script, 1)
 
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.destDir)
+    assertEquals('C:/workspace/.venv/venv-58734446', venv.destDir)
   }
 
   @Test
