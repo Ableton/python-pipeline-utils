@@ -1,5 +1,5 @@
-library 'ableton-utils@0.19'
-library 'groovylint@0.9'
+library 'ableton-utils@0.21'
+library 'groovylint@0.12'
 
 
 devToolsProject.run(
@@ -21,7 +21,7 @@ devToolsProject.run(
     )
   },
   publish: { data ->
-    docs.publish("${data['docs']}/", 'AbletonDevTools/python-pipeline-utils')
+    jupiter.publishDocs("${data['docs']}/", 'AbletonDevTools/python-pipeline-utils')
   },
   deployWhen: { return devToolsProject.shouldDeploy() },
   deploy: { data ->
