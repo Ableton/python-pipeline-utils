@@ -19,8 +19,7 @@ class VirtualEnv implements Serializable {
    */
   String destDir = null
   /**
-   * Series of commands needed to activate a virtualenv inside the
-   * current shell.
+   * Series of commands needed to activate a virtualenv inside the current shell.
    */
   String activateCommands = null
 
