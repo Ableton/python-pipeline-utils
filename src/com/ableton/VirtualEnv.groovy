@@ -4,7 +4,7 @@ import com.cloudbees.groovy.cps.NonCPS
 
 
 /**
- * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
+ * Provides a minimal wrapper around a Python virtualenv environment. The virtualenv is
  * stored under the workspace.
  */
 class VirtualEnv implements Serializable {
@@ -117,7 +117,7 @@ class VirtualEnv implements Serializable {
   }
 
   /**
-   * Removes the Virtualenv from disk. You can call this method in the cleanup stage of
+   * Removes the virtualenv from disk. You can call this method in the cleanup stage of
    * the pipeline to avoid cluttering the build node with temporary files. Note that the
    * virtualenv is stored underneath the workspace, so removing the workspace will have
    * the same effect.
