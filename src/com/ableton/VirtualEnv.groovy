@@ -5,7 +5,7 @@ import com.cloudbees.groovy.cps.NonCPS
 
 /**
  * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
- * stored under the system temporary directory is unique for each build number.
+ * stored under the workspace.
  */
 class VirtualEnv implements Serializable {
   /**
@@ -15,7 +15,7 @@ class VirtualEnv implements Serializable {
   Object script
   /**
    * Destination directory for the virtualenv. This value is set during construction of
-   * the object, and is under the system temporary directory.
+   * the object, and is under the workspace.
    */
   String destDir = null
   /**
