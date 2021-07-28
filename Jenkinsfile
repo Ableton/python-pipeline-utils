@@ -21,7 +21,7 @@ devToolsProject.run(
     )
   },
   publish: { data ->
-    jupiter.publishDocs("${data['docs']}/", 'AbletonDevTools/python-pipeline-utils')
+    jupiter.publishDocs("${data['docs']}/", 'Ableton/python-pipeline-utils')
   },
   deployWhen: { return devToolsProject.shouldDeploy() },
   deploy: { data ->
