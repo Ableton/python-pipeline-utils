@@ -4,8 +4,8 @@ import com.cloudbees.groovy.cps.NonCPS
 
 
 /**
- * Provides a minimal wrapper around a Python Virtualenv environment. The Virtualenv is
- * stored under the system temporary directory is unique for each build number.
+ * Provides a minimal wrapper around a Python virtualenv environment. The virtualenv is
+ * stored under the workspace.
  */
 class VirtualEnv implements Serializable {
   /**
@@ -15,12 +15,11 @@ class VirtualEnv implements Serializable {
   Object script
   /**
    * Destination directory for the virtualenv. This value is set during construction of
-   * the object, and is under the system temporary directory.
+   * the object, and is under the workspace.
    */
   String destDir = null
   /**
-   * Series of commands needed to activate a virtualenv inside the
-   * current shell.
+   * Series of commands needed to activate a virtualenv inside the current shell.
    */
   String activateCommands = null
 
@@ -117,7 +116,7 @@ class VirtualEnv implements Serializable {
   }
 
   /**
-   * Removes the Virtualenv from disk. You can call this method in the cleanup stage of
+   * Removes the virtualenv from disk. You can call this method in the cleanup stage of
    * the pipeline to avoid cluttering the build node with temporary files. Note that the
    * virtualenv is stored underneath the workspace, so removing the workspace will have
    * the same effect.
