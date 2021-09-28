@@ -1,4 +1,4 @@
-library(identifier: 'ableton-utils@0.21', changelog: false)
+library(identifier: 'ableton-utils@0.22', changelog: false)
 library(identifier: 'groovylint@0.12', changelog: false)
 
 
