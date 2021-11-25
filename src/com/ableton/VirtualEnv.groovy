@@ -51,6 +51,7 @@ class VirtualEnv implements Serializable {
     venv.activateCommands = """
       export PYENV_ROOT=${pyenvRoot}
       export PATH=\$PYENV_ROOT/bin:\$PATH
+      eval "\$(pyenv init --path)"
       eval "\$(pyenv init -)"
     """
 
