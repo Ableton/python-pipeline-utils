@@ -62,7 +62,7 @@ class VirtualEnv implements Serializable {
       activateSubDir = 'bin'
     } else {
       activateSubDir = 'Scripts'
-      workspace = workspace.replace('\\', '/')
+      workspace = posixPath(workspace)
     }
 
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
@@ -83,9 +83,12 @@ class VirtualEnv implements Serializable {
    * the pipeline to avoid cluttering the build node with temporary files. Note that the
    * virtualenv is stored underneath the workspace, so removing the workspace will have
    * the same effect.
+   *
+   * We use `sh` here rather than `deleteDir` because the latter doesn't work with CygWin
+   * paths on Windows.
    */
   void cleanup() {
-    script.dir(venvRootDir) { script.deleteDir() }
+    script.sh "rm -rf ${venvRootDir}"
   }
 
   /**
