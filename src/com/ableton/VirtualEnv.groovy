@@ -70,6 +70,14 @@ class VirtualEnv implements Serializable {
     this.venvBinDir = "${venvRootDir}/${activateSubDir}"
   }
 
+  @NonCPS
+  static final String posixPath(String path) {
+    if (path[1] == ':') {
+      return "/${path[0].toLowerCase()}/${path.substring(3).replaceAll('\\\\', '/')}"
+    }
+    return path.replaceAll('\\\\', '/')
+  }
+
   /**
    * Removes the virtualenv from disk. You can call this method in the cleanup stage of
    * the pipeline to avoid cluttering the build node with temporary files. Note that the

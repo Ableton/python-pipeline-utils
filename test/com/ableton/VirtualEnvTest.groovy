@@ -125,6 +125,14 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void posixPath() {
+    assertEquals('/c/foo/bar', VirtualEnv.posixPath('/c/foo/bar'))
+    assertEquals('/c/foo/bar', VirtualEnv.posixPath('C:\\foo\\bar'))
+    assertEquals('foo/bar', VirtualEnv.posixPath('foo\\bar'))
+    assertEquals('foo/bar', VirtualEnv.posixPath('foo/bar'))
+  }
+
+  @Test
   void randomName() {
     assertEquals('58734446', VirtualEnv.randomName(1))
   }
