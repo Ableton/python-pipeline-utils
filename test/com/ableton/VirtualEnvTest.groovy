@@ -87,7 +87,7 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
-    assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+    assertEquals("/c/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
