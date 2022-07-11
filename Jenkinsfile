@@ -21,11 +21,13 @@ devToolsProject.run(
   },
 )
 
-devToolsProject.run(
-  deployWhen: { return devToolsProject.shouldDeploy() },
-  deploy: { data ->
-    String versionNumber = readFile('VERSION').trim()
-    version.tag(versionNumber)
-    version.forwardMinorBranch(versionNumber)
-  },
-)
+if (devToolsProject.shouldDeploy()) {
+  devToolsProject.run(
+    deployWhen: { return true },
+    deploy: { data ->
+      String versionNumber = readFile('VERSION').trim()
+      version.tag(versionNumber)
+      version.forwardMinorBranch(versionNumber)
+    },
+  )
+}
