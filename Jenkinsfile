@@ -19,6 +19,9 @@ devToolsProject.run(
   publish: { data ->
     jupiter.publishDocs("${data['docs']}/", 'Ableton/python-pipeline-utils')
   },
+)
+
+devToolsProject.run(
   deployWhen: { return devToolsProject.shouldDeploy() },
   deploy: { data ->
     String versionNumber = readFile('VERSION').trim()
