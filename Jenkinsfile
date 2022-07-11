@@ -5,12 +5,8 @@ library(identifier: 'groovylint@0.13', changelog: false)
 devToolsProject.run(
   test: { data ->
     parallel(failFast: false,
-      groovydoc: {
-        data['docs'] = groovydoc.generate()
-      },
-      groovylint: {
-        groovylint.check('./Jenkinsfile,./*.gradle,**/*.groovy')
-      },
+      groovydoc: { data['docs'] = groovydoc.generate() },
+      groovylint: { groovylint.check('./Jenkinsfile,./*.gradle,**/*.groovy') },
       junit: {
         try {
           sh './gradlew test'
