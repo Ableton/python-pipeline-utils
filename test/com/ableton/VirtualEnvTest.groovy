@@ -1,13 +1,14 @@
 package com.ableton
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertTrue
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertFalse
+import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
 /**
@@ -17,7 +18,7 @@ class VirtualEnvTest extends BasePipelineTest {
   Object script
 
   @Override
-  @Before
+  @BeforeEach
   @SuppressWarnings('ThrowException')
   void setUp() {
     super.setUp()
@@ -75,27 +76,27 @@ class VirtualEnvTest extends BasePipelineTest {
     assertTrue(venv.activateCommands.contains(pyenvRoot))
   }
 
-  @Test(expected = Exception)
+  @Test
   void createPyenvInvalidRoot() {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return false }
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    VirtualEnv.create(script, '1.2.3', pyenvRoot)
+    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', pyenvRoot) }
   }
 
-  @Test(expected = AssertionError)
+  @Test
   void createPyenvNoRoot() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    VirtualEnv.create(script, '1.2.3', null)
+    assertThrows(AssertionError) { VirtualEnv.create(script, '1.2.3', null) }
   }
 
-  @Test(expected = Exception)
+  @Test
   void createPyenvWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
 
-    VirtualEnv.create(script, '1.2.3', 'C:\\pyenv')
+    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', 'C:\\pyenv') }
   }
 
   @Test
