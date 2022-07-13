@@ -12,7 +12,7 @@ dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.4.14'
 
   testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.14'
-  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 }
 
 sourceSets {
@@ -26,4 +26,8 @@ sourceSets {
       srcDirs = ['test']
     }
   }
+}
+
+test {
+  useJUnitPlatform()
 }

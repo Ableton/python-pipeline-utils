@@ -1,20 +1,21 @@
 package com.ableton
 
 import static com.lesfurets.jenkins.unit.MethodCall.callArgsToString
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertTrue
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
 class PipenvTest extends BasePipelineTest {
   Object script
 
   @Override
-  @Before
+  @BeforeEach
   void setUp() throws Exception {
     super.setUp()
 
@@ -61,13 +62,13 @@ class PipenvTest extends BasePipelineTest {
     })
   }
 
-  @Test(expected = AssertionError)
+  @Test
   void runWithNoScript() throws Exception {
-    new Pipenv().runWith(['2.7']) {}
+    assertThrows(AssertionError) { new Pipenv().runWith(['2.7']) {} }
   }
 
-  @Test(expected = AssertionError)
+  @Test
   void runWithEmptyPythonVersions() throws Exception {
-    new Pipenv(script: script).runWith([]) {}
+    assertThrows(AssertionError) { new Pipenv(script: script).runWith([]) {} }
   }
 }

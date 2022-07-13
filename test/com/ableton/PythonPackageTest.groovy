@@ -1,11 +1,12 @@
 package com.ableton
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.junit.jupiter.api.Assertions.assertNotNull
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
 /**
@@ -15,7 +16,7 @@ class PythonPackageTest extends BasePipelineTest {
   Object script
 
   @Override
-  @Before
+  @BeforeEach
   void setUp() throws Exception {
     super.setUp()
 
@@ -74,13 +75,17 @@ __version__ = '1.2.3'\n
     assertEquals('1.2.3', version)
   }
 
-  @Test(expected = AssertionError)
+  @Test
   void noScript() throws Exception {
-    new PythonPackage().readVersion(filename: '__init__.py')
+    assertThrows(AssertionError) {
+      new PythonPackage().readVersion(filename: '__init__.py')
+    }
   }
 
-  @Test(expected = AssertionError)
+  @Test
   void noFilename() throws Exception {
-    new PythonPackage(script: script).readVersion(filename: null)
+    assertThrows(AssertionError) {
+      new PythonPackage(script: script).readVersion(filename: null)
+    }
   }
 }
