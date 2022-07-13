@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
   compile 'com.cloudbees:groovy-cps:1+'
-  compile 'org.codehaus.groovy:groovy-all:2.4.12'
+  compile 'org.codehaus.groovy:groovy-all:2.4.14'
 
   testCompile 'com.lesfurets:jenkins-pipeline-unit:1.14'
   testCompile 'junit:junit:4.13.2'
