@@ -38,11 +38,11 @@ eventRecorder.timedStage('Integration Test') {
 
         if (isUnix()) {
           echo 'Test VirtualEnv.createWithPyenv'
-          Object pyvenv = virtualenv.createWithPyenv('3.8.0')
+          Object pyvenv = virtualenv.createWithPyenv('3.10.3')
           String pyvenvVersion =
             pyvenv.run(returnStdout: true, script: 'python --version')
           echo pyvenvVersion
-          assert pyvenvVersion.trim() == 'Python 3.8.0'
+          assert pyvenvVersion.trim() == 'Python 3.10.3'
         }
       }
     }
