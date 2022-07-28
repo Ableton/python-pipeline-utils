@@ -35,6 +35,8 @@ eventRecorder.timedStage('Integration Test') {
         nodeLabel = 'generic-mac-xcode12.2'
       }
       eventRecorder.timedNode(nodeLabel) {
+        sh 'env | sort'
+
         echo 'Test VirtualEnv.create'
         Object venv = virtualenv.create('python3')
         String venvVersion = venv.run(returnStdout: true, script: 'python --version')
