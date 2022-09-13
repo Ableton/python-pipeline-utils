@@ -48,18 +48,6 @@ stage('Test') {
 ```
 
 
-### `virtualenvs`
-
-This singleton is similar to `virtualenv`, but is a list of `virtualenv` objects. It is
-intended to make testing code with multiple Python versions easier.
-
-```groovy
-Object venvs = virtualenvs.create(['python3.6', 'python3.7', 'python3.8'])
-venvs.run('pip install -r requirements.txt')
-venvs.run('pytest .')
-```
-
-
 ## Building and Testing
 
 The `python-pipeline-utils` library can be developed locally using the provided Gradle
