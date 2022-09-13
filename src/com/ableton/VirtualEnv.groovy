@@ -123,9 +123,7 @@ class VirtualEnv implements Serializable {
    * the same effect.
    */
   void cleanup() {
-    script.dir(venvRootDir) {
-      script.deleteDir()
-    }
+    script.dir(venvRootDir) { script.deleteDir() }
   }
 
   /**
