@@ -19,19 +19,6 @@ This library contains singleton wrappers for the classes so that the `Jenkinsfil
 a bit less verbose.
 
 
-### `pipenv`
-
-The `pipenv` singleton runs a closure using [`pipenv`](pipenv) for a list of Python
-versions. Unlike the `virtualenv` singleton, it automatically installs packages from the
-`pipenv` lockfile with `pipenv sync --dev --python`.
-
-```groovy
-pipenv.runWith(['python3.6', 'python3.7', 'python3.8']) { python ->
-  sh(label: "Running unit tests with ${python}", script: 'pytest .')
-}
-```
-
-
 ### `pythonPackage`
 
 The `pythonPackage` singleton parses the version number from a package, returning it as a
@@ -93,4 +80,3 @@ This project is maintained by the following GitHub users:
 
 [jenkins-pipeline-unit]: https://github.com/jenkinsci/JenkinsPipelineUnit
 [jenkins-shared-lib-usage]: https://jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries
-[pipenv]: https://pypi.org/project/pipenv/
