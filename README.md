@@ -19,6 +19,35 @@ This library contains singleton wrappers for the classes so that the `Jenkinsfil
 a bit less verbose.
 
 
+### `pyenv`
+
+The `pyenv` singleton can be used to create a Python Virtualenv in combination with
+[pyenv][pyenv]. For this to work, Pyenv must already be installed on the build node.
+
+```groovy
+Object venv
+
+stage('Setup with environment variable') {
+  // This assumes that there is a PYENV_ROOT environment variable with the correct path.
+  // Note that Jenkins overrides environment variables, so this would need to be defined
+  // in your Jenkins configuration for the given executor.
+  venv = pyenv.createVirtualEnv('3.6.0')
+  venv.run('pip install -r requirements.txt')
+}
+
+stage('Setup with manual path') {
+  venv = pyenv.createVirtualEnv('3.6.0', '/path/to/pyenv/root')
+  venv.run('pip install -r requirements.txt')
+}
+
+stage('Test') {
+  venv.run(label: 'Run unit tests', script: 'pytest .')
+}
+```
+
+Note that the `pyenv` singleton does not currently support Windows.
+
+
 ### `pythonPackage`
 
 The `pythonPackage` singleton parses the version number from a package, returning it as a
@@ -68,3 +97,4 @@ This project is maintained by the following GitHub users:
 
 [jenkins-pipeline-unit]: https://github.com/jenkinsci/JenkinsPipelineUnit
 [jenkins-shared-lib-usage]: https://jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries
+[pyenv]: https://github.com/pyenv/pyenv

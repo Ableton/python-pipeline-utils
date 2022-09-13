@@ -38,7 +38,7 @@ eventRecorder.timedStage('Integration Test') {
 
         if (isUnix()) {
           echo 'Test VirtualEnv.createWithPyenv'
-          Object pyvenv = virtualenv.createWithPyenv('3.10.3')
+          Object pyvenv = pyenv.createVirtualEnv('3.10.3')
           String pyvenvVersion =
             pyvenv.run(returnStdout: true, script: 'python --version')
           echo pyvenvVersion

@@ -3,7 +3,6 @@ package com.ableton
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertNotNull
-import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
@@ -51,48 +50,6 @@ class VirtualEnvTest extends BasePipelineTest {
     helper.addShMock("virtualenv --python=${python} ${venv.venvRootDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
     assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
-  }
-
-  @Test
-  void createPyenv() {
-    String pythonVersion = '1.2.3'
-    String pyenvRoot = '/mock/pyenv/root'
-    helper.registerAllowedMethod('fileExists', [String]) { return true }
-    helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock("""
-      export PYENV_ROOT=${pyenvRoot}
-      export PATH=\$PYENV_ROOT/bin:\$PATH
-      eval "\$(pyenv init -)"
-      pyenv install --skip-existing ${pythonVersion}
-      pyenv shell ${pythonVersion}
-      pip install virtualenv
-      virtualenv /workspace/${pythonVersion}
-    """, '', 0)
-
-    VirtualEnv.create(script, pythonVersion, pyenvRoot)
-  }
-
-  @Test
-  void createPyenvInvalidRoot() {
-    String pyenvRoot = '/mock/pyenv/root'
-    helper.registerAllowedMethod('fileExists', [String]) { return false }
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', pyenvRoot) }
-  }
-
-  @Test
-  void createPyenvNoRoot() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(AssertionError) { VirtualEnv.create(script, '1.2.3', null) }
-  }
-
-  @Test
-  void createPyenvWindows() {
-    helper.registerAllowedMethod('isUnix', []) { return false }
-
-    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', 'C:\\pyenv') }
   }
 
   @Test
