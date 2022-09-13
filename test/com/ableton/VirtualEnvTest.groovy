@@ -213,11 +213,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStatus() {
-    String mockScriptCall = """
-      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
-      mock-script
-    """
-    helper.addShMock(mockScriptCall, 'mock output', 1234)
+    helper.addShMock('mock-script', 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     int result = new VirtualEnv(script, 1).run(script: 'mock-script', returnStatus: true)
@@ -230,11 +226,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStdout() {
-    String mockScriptCall = """
-      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
-      mock-script
-    """
-    helper.addShMock(mockScriptCall, 'mock output', 0)
+    helper.addShMock('mock-script', 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     String result = new VirtualEnv(script, 1)

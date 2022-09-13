@@ -152,17 +152,15 @@ class VirtualEnv implements Serializable {
     assert arguments
     assert arguments.containsKey('script')
 
-    String scriptCommand = """
-      ${this.activateCommands}
-      ${arguments.script}
-    """
-    // We shouldn't modify the original arguments map
-    Map newArguments = arguments.clone()
-    // Replace the original `script` command with the venv-activated one
-    newArguments['script'] = scriptCommand
-    newArguments['label'] = arguments.label ?:
-      "Run command in virtualenv: ${arguments.script}"
-    return script.sh(newArguments)
+    if (!arguments.label) {
+      arguments['label'] = "Run command in virtualenv: ${arguments.script}"
+    }
+    @SuppressWarnings('VariableTypeRequired')
+    def result = null
+    inside {
+      result = script.sh(arguments)
+    }
+    return result
   }
 
   /**
@@ -171,13 +169,7 @@ class VirtualEnv implements Serializable {
    * @param command Command to run.
    */
   void run(String command) {
-    script.sh(
-      label: "Run command in virtualenv: ${command}",
-      script: """
-        ${this.activateCommands}
-        ${command}
-      """,
-    )
+    inside { script.sh(label: "Run command in virtualenv: ${command}", script: command) }
   }
 
   @NonCPS
