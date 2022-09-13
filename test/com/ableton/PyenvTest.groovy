@@ -42,7 +42,7 @@ class PyenvTest extends BasePipelineTest {
       virtualenv /workspace/${pythonVersion}
     """, '', 0)
 
-    Pyenv.createVirtualEnv(script, pythonVersion, pyenvRoot)
+    new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion)
   }
 
   @Test
@@ -51,20 +51,20 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('fileExists', [String]) { return false }
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    assertThrows(Exception) { Pyenv.createVirtualEnv(script, '1.2.3', pyenvRoot) }
+    assertThrows(Exception) { new Pyenv(script, '1.2.3', pyenvRoot).createVirtualEnv() }
   }
 
   @Test
   void createVirtualEnvNoRoot() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    assertThrows(AssertionError) { Pyenv.createVirtualEnv(script, '1.2.3', null) }
+    assertThrows(AssertionError) { new Pyenv(script, null).createVirtualEnv('1.2.3') }
   }
 
   @Test
   void createVirtualEnvWindows() {
     helper.registerAllowedMethod('isUnix', []) { return false }
 
-    assertThrows(Exception) { Pyenv.createVirtualEnv(script, '1.2.3', 'C:\\pyenv') }
+    assertThrows(Exception) { new Pyenv(script, 'C:\\pyenv').createVirtualEnv('1.2.3') }
   }
 }

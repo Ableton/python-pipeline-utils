@@ -9,17 +9,35 @@ package com.ableton
  */
 class Pyenv implements Serializable {
   /**
+   * Script context.
+   * <strong>Required value, may not be null!</strong>
+   */
+  Object script
+  /**
+   * Pyenv root directory.
+   * <strong>Required value, may not be null!</strong>
+   */
+  String pyenvRoot
+
+  Pyenv(Object script, String pyenvRoot) {
+    this.script = script
+    this.pyenvRoot = pyenvRoot
+  }
+
+  /**
    * Create a virtualenv using a specific version of Python, installed via pyenv. pyenv
    * should be installed on the node, but the actual setup of any required environment
    * variables (e.g. PYENV_ROOT and PATH) will be done inside this function.
    *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
-   * @param python Python version, as given by pyenv versions --list.
-   * @param pyenvRoot Path to the installation of pyenv.
+   * @param pythonVersion Python version, as given by pyenv versions --list.
    * @return New instance of VirtualEnv object.
    */
-  static VirtualEnv createVirtualEnv(Object script, String python, String pyenvRoot) {
+  VirtualEnv createVirtualEnv(String pythonVersion) {
+    assert script
+    assert pythonVersion
+
     if (!script.isUnix()) {
       script.error 'This method is not supported on Windows'
     }
@@ -32,14 +50,14 @@ class Pyenv implements Serializable {
     }
 
     venv.script.sh(
-      label: "Install Python version ${python} with pyenv",
+      label: "Install Python version ${pythonVersion} with pyenv",
       script: """
         export PYENV_ROOT=${pyenvRoot}
         export PATH=\$PYENV_ROOT/bin:\$PATH
         eval "\$(pyenv init --path)"
         eval "\$(pyenv init -)"
-        pyenv install --skip-existing ${python}
-        pyenv shell ${python}
+        pyenv install --skip-existing ${pythonVersion}
+        pyenv shell ${pythonVersion}
         pip install virtualenv
         virtualenv ${venv.venvRootDir}
       """,
