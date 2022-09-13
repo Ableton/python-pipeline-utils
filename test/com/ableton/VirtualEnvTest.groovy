@@ -45,9 +45,9 @@ class VirtualEnvTest extends BasePipelineTest {
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
-    helper.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
+    helper.addShMock("virtualenv --python=${python} ${venv.venvRootDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
-    assertEquals(venv.destDir, createdVenv.destDir)
+    assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
   }
 
   @Test
@@ -107,8 +107,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     assertNotNull(venv)
     assertNotNull(venv.script)
-    assertNotNull(venv.destDir)
-    assertEquals('/workspace/.venv/venv-58734446', venv.destDir)
+    assertNotNull(venv.venvRootDir)
+    assertEquals('/workspace/.venv/venv-58734446', venv.venvRootDir)
   }
 
   @Test
@@ -120,8 +120,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     assertNotNull(venv)
     assertNotNull(venv.script)
-    assertNotNull(venv.destDir)
-    assertEquals('C:/workspace/.venv/venv-58734446', venv.destDir)
+    assertNotNull(venv.venvRootDir)
+    assertEquals('C:/workspace/.venv/venv-58734446', venv.venvRootDir)
   }
 
   @Test
@@ -132,8 +132,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     // Expect that the dirname of the python installation is stripped from the
     // virtualenv directory, but that it still retains the correct python version.
-    assertFalse(venv.destDir.contains('usr/bin'))
-    assertTrue(venv.destDir.endsWith('venv-58734446'))
+    assertFalse(venv.venvRootDir.contains('usr/bin'))
+    assertTrue(venv.venvRootDir.endsWith('venv-58734446'))
   }
 
   @Test
@@ -142,8 +142,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
-    assertFalse(venv.destDir.startsWith('/c'))
-    assertTrue(venv.destDir.endsWith('venv-58734446'))
+    assertFalse(venv.venvRootDir.startsWith('/c'))
+    assertTrue(venv.venvRootDir.endsWith('venv-58734446'))
   }
 
   @Test
