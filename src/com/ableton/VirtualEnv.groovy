@@ -24,8 +24,6 @@ class VirtualEnv implements Serializable {
    */
   String venvRootDir = null
 
-  protected String activateSubDir = null
-
   /**
    * Create a virtualenv using a specific version of Python, installed via pyenv. pyenv
    * should be installed on the node, but the actual setup of any required environment
@@ -97,6 +95,7 @@ class VirtualEnv implements Serializable {
     assert script
 
     this.script = script
+    String activateSubDir
     String workspace = script.env.WORKSPACE
 
     if (script.isUnix()) {
