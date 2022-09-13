@@ -18,6 +18,11 @@ class VirtualEnv implements Serializable {
    */
   String activateCommands = null
   /**
+   * Binary directory for the virtualenv on disk. This value is set during construction of
+   * the object.
+   */
+  String venvBinDir = null
+  /**
    * Root directory for the virtualenv on disk. This value is set during construction of
    * the object, and is under the workspace.
    */
@@ -113,6 +118,7 @@ class VirtualEnv implements Serializable {
 
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
     this.venvRootDir = "${workspace}/.venv/venv-${randomName(seed)}"
+    this.venvBinDir = "${venvRootDir}/${activateSubDir}"
     this.activateCommands = ". ${venvRootDir}/${activateSubDir}/activate"
   }
 
@@ -124,6 +130,15 @@ class VirtualEnv implements Serializable {
    */
   void cleanup() {
     script.dir(venvRootDir) { script.deleteDir() }
+  }
+
+  /**
+   * Run a closure body inside of the virtualenv.
+   *
+   * @param body Closure body to execute.
+   */
+  void inside(Closure body) {
+    script.withEnv(["PATH+VENVBIN=${venvBinDir}"]) { body() }
   }
 
   /**

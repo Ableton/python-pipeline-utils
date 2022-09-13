@@ -103,6 +103,19 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void inside() {
+    helper.registerAllowedMethod('isUnix', []) { return true }
+    Map insideEnv
+
+    new VirtualEnv(script, 1).inside { insideEnv = binding.getVariable('env') }
+
+    assertTrue(insideEnv.keySet().contains('PATH+VENVBIN'))
+    assertEquals(
+      "/workspace/.venv/${TEST_RANDOM_NAME}/bin" as String, insideEnv['PATH+VENVBIN']
+    )
+  }
+
+  @Test
   void newObjectUnix() {
     helper.registerAllowedMethod('isUnix', []) { return true }
 
