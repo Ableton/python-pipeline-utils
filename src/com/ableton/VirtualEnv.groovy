@@ -14,14 +14,14 @@ class VirtualEnv implements Serializable {
    */
   Object script
   /**
-   * Destination directory for the virtualenv. This value is set during construction of
-   * the object, and is under the workspace.
-   */
-  String destDir = null
-  /**
    * Series of commands needed to activate a virtualenv inside the current shell.
    */
   String activateCommands = null
+  /**
+   * Root directory for the virtualenv on disk. This value is set during construction of
+   * the object, and is under the workspace.
+   */
+  String venvRootDir = null
 
   protected String activateSubDir = null
 
@@ -62,11 +62,11 @@ class VirtualEnv implements Serializable {
         pyenv install --skip-existing ${python}
         pyenv shell ${python}
         pip install virtualenv
-        virtualenv ${venv.destDir}
+        virtualenv ${venv.venvRootDir}
       """,
     )
 
-    venv.activateCommands += ". ${venv.destDir}/${venv.activateSubDir}/activate"
+    venv.activateCommands += ". ${venv.venvRootDir}/${venv.activateSubDir}/activate"
 
     return venv
   }
@@ -84,7 +84,7 @@ class VirtualEnv implements Serializable {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     venv.script.sh(
       label: "Create virtualenv for ${python}",
-      script: "virtualenv --python=${python} ${venv.destDir}",
+      script: "virtualenv --python=${python} ${venv.venvRootDir}",
     )
     return venv
   }
@@ -112,8 +112,8 @@ class VirtualEnv implements Serializable {
     }
 
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
-    this.destDir = "${workspace}/.venv/venv-${randomName(seed)}"
-    this.activateCommands = ". ${destDir}/${activateSubDir}/activate"
+    this.venvRootDir = "${workspace}/.venv/venv-${randomName(seed)}"
+    this.activateCommands = ". ${venvRootDir}/${activateSubDir}/activate"
   }
 
   /**
@@ -123,9 +123,7 @@ class VirtualEnv implements Serializable {
    * the same effect.
    */
   void cleanup() {
-    script.dir(destDir) {
-      script.deleteDir()
-    }
+    script.dir(venvRootDir) { script.deleteDir() }
   }
 
   /**

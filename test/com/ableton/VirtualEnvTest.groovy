@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test
  * Tests for the VirtualEnv class.
  */
 class VirtualEnvTest extends BasePipelineTest {
+  // Expected random virtualenv directory name for the seed value of 1
+  final static String TEST_RANDOM_NAME = 'venv-58734446'
+
   Object script
 
   @Override
@@ -45,9 +48,9 @@ class VirtualEnvTest extends BasePipelineTest {
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
-    helper.addShMock("virtualenv --python=${python} ${venv.destDir}", '', 0)
+    helper.addShMock("virtualenv --python=${python} ${venv.venvRootDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
-    assertEquals(venv.destDir, createdVenv.destDir)
+    assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
   }
 
   @Test
@@ -107,8 +110,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     assertNotNull(venv)
     assertNotNull(venv.script)
-    assertNotNull(venv.destDir)
-    assertEquals('/workspace/.venv/venv-58734446', venv.destDir)
+    assertNotNull(venv.venvRootDir)
+    assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -120,8 +123,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     assertNotNull(venv)
     assertNotNull(venv.script)
-    assertNotNull(venv.destDir)
-    assertEquals('C:/workspace/.venv/venv-58734446', venv.destDir)
+    assertNotNull(venv.venvRootDir)
+    assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -132,8 +135,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     // Expect that the dirname of the python installation is stripped from the
     // virtualenv directory, but that it still retains the correct python version.
-    assertFalse(venv.destDir.contains('usr/bin'))
-    assertTrue(venv.destDir.endsWith('venv-58734446'))
+    assertFalse(venv.venvRootDir.contains('usr/bin'))
+    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
@@ -142,8 +145,8 @@ class VirtualEnvTest extends BasePipelineTest {
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
-    assertFalse(venv.destDir.startsWith('/c'))
-    assertTrue(venv.destDir.endsWith('venv-58734446'))
+    assertFalse(venv.venvRootDir.startsWith('/c'))
+    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
@@ -197,10 +200,10 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStatus() {
-    String mockScriptCall = '''
-      . /workspace/.venv/venv-58734446/bin/activate
+    String mockScriptCall = """
+      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
       mock-script
-    '''
+    """
     helper.addShMock(mockScriptCall, 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
@@ -214,10 +217,10 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStdout() {
-    String mockScriptCall = '''
-      . /workspace/.venv/venv-58734446/bin/activate
+    String mockScriptCall = """
+      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
       mock-script
-    '''
+    """
     helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
