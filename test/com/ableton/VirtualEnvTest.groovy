@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test
  * Tests for the VirtualEnv class.
  */
 class VirtualEnvTest extends BasePipelineTest {
+  // Expected random virtualenv directory name for the seed value of 1
+  final static String TEST_RANDOM_NAME = 'venv-58734446'
+
   Object script
 
   @Override
@@ -108,7 +111,7 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
-    assertEquals('/workspace/.venv/venv-58734446', venv.venvRootDir)
+    assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -121,7 +124,7 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
-    assertEquals('C:/workspace/.venv/venv-58734446', venv.venvRootDir)
+    assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -133,7 +136,7 @@ class VirtualEnvTest extends BasePipelineTest {
     // Expect that the dirname of the python installation is stripped from the
     // virtualenv directory, but that it still retains the correct python version.
     assertFalse(venv.venvRootDir.contains('usr/bin'))
-    assertTrue(venv.venvRootDir.endsWith('venv-58734446'))
+    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
@@ -143,7 +146,7 @@ class VirtualEnvTest extends BasePipelineTest {
     VirtualEnv venv = new VirtualEnv(script, 1)
 
     assertFalse(venv.venvRootDir.startsWith('/c'))
-    assertTrue(venv.venvRootDir.endsWith('venv-58734446'))
+    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
@@ -197,10 +200,10 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStatus() {
-    String mockScriptCall = '''
-      . /workspace/.venv/venv-58734446/bin/activate
+    String mockScriptCall = """
+      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
       mock-script
-    '''
+    """
     helper.addShMock(mockScriptCall, 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
@@ -214,10 +217,10 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStdout() {
-    String mockScriptCall = '''
-      . /workspace/.venv/venv-58734446/bin/activate
+    String mockScriptCall = """
+      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
       mock-script
-    '''
+    """
     helper.addShMock(mockScriptCall, 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
