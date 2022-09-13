@@ -14,10 +14,6 @@ class VirtualEnv implements Serializable {
    */
   Object script
   /**
-   * Series of commands needed to activate a virtualenv inside the current shell.
-   */
-  String activateCommands = null
-  /**
    * Binary directory for the virtualenv on disk. This value is set during construction of
    * the object.
    */
@@ -53,25 +49,19 @@ class VirtualEnv implements Serializable {
       script.error "pyenv root path '${pyenvRoot}' does not exist"
     }
 
-    venv.activateCommands = """
-      export PYENV_ROOT=${pyenvRoot}
-      export PATH=\$PYENV_ROOT/bin:\$PATH
-      eval "\$(pyenv init --path)"
-      eval "\$(pyenv init -)"
-    """
-
     venv.script.sh(
       label: "Install Python version ${python} with pyenv",
       script: """
-        ${venv.activateCommands}
+        export PYENV_ROOT=${pyenvRoot}
+        export PATH=\$PYENV_ROOT/bin:\$PATH
+        eval "\$(pyenv init --path)"
+        eval "\$(pyenv init -)"
         pyenv install --skip-existing ${python}
         pyenv shell ${python}
         pip install virtualenv
         virtualenv ${venv.venvRootDir}
       """,
     )
-
-    venv.activateCommands += ". ${venv.venvRootDir}/${venv.activateSubDir}/activate"
 
     return venv
   }
@@ -119,7 +109,6 @@ class VirtualEnv implements Serializable {
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
     this.venvRootDir = "${workspace}/.venv/venv-${randomName(seed)}"
     this.venvBinDir = "${venvRootDir}/${activateSubDir}"
-    this.activateCommands = ". ${venvRootDir}/${activateSubDir}/activate"
   }
 
   /**

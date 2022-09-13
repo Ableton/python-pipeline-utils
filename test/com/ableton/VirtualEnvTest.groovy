@@ -59,24 +59,17 @@ class VirtualEnvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    // Note: This empty string allows us to compensate for trailing whitespace, which is
-    // needed to match the string given to the sh mock.
-    String empty = ''
     helper.addShMock("""
-      ${empty}
       export PYENV_ROOT=${pyenvRoot}
       export PATH=\$PYENV_ROOT/bin:\$PATH
       eval "\$(pyenv init -)"
-    ${empty}
       pyenv install --skip-existing ${pythonVersion}
       pyenv shell ${pythonVersion}
       pip install virtualenv
       virtualenv /workspace/${pythonVersion}
     """, '', 0)
 
-    VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
-
-    assertTrue(venv.activateCommands.contains(pyenvRoot))
+    VirtualEnv.create(script, pythonVersion, pyenvRoot)
   }
 
   @Test
