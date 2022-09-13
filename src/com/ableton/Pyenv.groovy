@@ -37,18 +37,17 @@ class Pyenv implements Serializable {
   VirtualEnv createVirtualEnv(String pythonVersion) {
     assert script
     assert pythonVersion
+    assert pyenvRoot
 
     if (!script.isUnix()) {
       script.error 'This method is not supported on Windows'
     }
 
-    VirtualEnv venv = new VirtualEnv(script)
-    assert pyenvRoot
-
     if (!script.fileExists(pyenvRoot)) {
       script.error "pyenv root path '${pyenvRoot}' does not exist"
     }
 
+    VirtualEnv venv = new VirtualEnv(script)
     venv.script.sh(
       label: "Install Python version ${pythonVersion} with pyenv",
       script: """
