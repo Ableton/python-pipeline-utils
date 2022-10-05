@@ -67,7 +67,7 @@ Example usage might look something like this:
 Object venv
 
 stage('Setup') {
-  venv = virtualenv.create(this, 'python3.6')
+  venv = virtualenv.create('python3.6')
   venv.run('pip install -r requirements.txt')
 }
 
