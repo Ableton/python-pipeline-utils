@@ -3,7 +3,6 @@ package com.ableton
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertNotNull
-import static org.junit.jupiter.api.Assertions.assertThrows
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
@@ -54,52 +53,16 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void createPyenv() {
-    String pythonVersion = '1.2.3'
-    String pyenvRoot = '/mock/pyenv/root'
-    helper.registerAllowedMethod('fileExists', [String]) { return true }
+  void inside() {
     helper.registerAllowedMethod('isUnix', []) { return true }
-    // Note: This empty string allows us to compensate for trailing whitespace, which is
-    // needed to match the string given to the sh mock.
-    String empty = ''
-    helper.addShMock("""
-      ${empty}
-      export PYENV_ROOT=${pyenvRoot}
-      export PATH=\$PYENV_ROOT/bin:\$PATH
-      eval "\$(pyenv init -)"
-    ${empty}
-      pyenv install --skip-existing ${pythonVersion}
-      pyenv shell ${pythonVersion}
-      pip install virtualenv
-      virtualenv /workspace/${pythonVersion}
-    """, '', 0)
+    Map insideEnv
 
-    VirtualEnv venv = VirtualEnv.create(script, pythonVersion, pyenvRoot)
+    new VirtualEnv(script, 1).inside { insideEnv = binding.getVariable('env') }
 
-    assertTrue(venv.activateCommands.contains(pyenvRoot))
-  }
-
-  @Test
-  void createPyenvInvalidRoot() {
-    String pyenvRoot = '/mock/pyenv/root'
-    helper.registerAllowedMethod('fileExists', [String]) { return false }
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', pyenvRoot) }
-  }
-
-  @Test
-  void createPyenvNoRoot() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(AssertionError) { VirtualEnv.create(script, '1.2.3', null) }
-  }
-
-  @Test
-  void createPyenvWindows() {
-    helper.registerAllowedMethod('isUnix', []) { return false }
-
-    assertThrows(Exception) { VirtualEnv.create(script, '1.2.3', 'C:\\pyenv') }
+    assertTrue(insideEnv.keySet().contains('PATH+VENVBIN'))
+    assertEquals(
+      "/workspace/.venv/${TEST_RANDOM_NAME}/bin" as String, insideEnv['PATH+VENVBIN']
+    )
   }
 
   @Test
@@ -200,11 +163,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStatus() {
-    String mockScriptCall = """
-      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
-      mock-script
-    """
-    helper.addShMock(mockScriptCall, 'mock output', 1234)
+    helper.addShMock('mock-script', 'mock output', 1234)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     int result = new VirtualEnv(script, 1).run(script: 'mock-script', returnStatus: true)
@@ -217,11 +176,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void runWithMapReturnStdout() {
-    String mockScriptCall = """
-      . /workspace/.venv/${TEST_RANDOM_NAME}/bin/activate
-      mock-script
-    """
-    helper.addShMock(mockScriptCall, 'mock output', 0)
+    helper.addShMock('mock-script', 'mock output', 0)
     helper.registerAllowedMethod('isUnix', []) { return true }
 
     String result = new VirtualEnv(script, 1)
