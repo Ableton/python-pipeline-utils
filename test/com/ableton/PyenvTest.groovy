@@ -27,6 +27,22 @@ class PyenvTest extends BasePipelineTest {
   }
 
   @Test
+  void assertPyenvRootInvalidRoot() {
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.registerAllowedMethod('fileExists', [String]) { return false }
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    assertThrows(Exception) { new Pyenv(script, '1.2.3', pyenvRoot).createVirtualEnv() }
+  }
+
+  @Test
+  void assertPyenvRootNoRoot() {
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    assertThrows(AssertionError) { new Pyenv(script, null).createVirtualEnv('1.2.3') }
+  }
+
+  @Test
   void createVirtualEnv() {
     String pythonVersion = '1.2.3'
     String pyenvRoot = '/mock/pyenv/root'
@@ -43,22 +59,6 @@ class PyenvTest extends BasePipelineTest {
     """, '', 0)
 
     new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion)
-  }
-
-  @Test
-  void createVirtualEnvInvalidRoot() {
-    String pyenvRoot = '/mock/pyenv/root'
-    helper.registerAllowedMethod('fileExists', [String]) { return false }
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(Exception) { new Pyenv(script, '1.2.3', pyenvRoot).createVirtualEnv() }
-  }
-
-  @Test
-  void createVirtualEnvNoRoot() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
-    assertThrows(AssertionError) { new Pyenv(script, null).createVirtualEnv('1.2.3') }
   }
 
   @Test
