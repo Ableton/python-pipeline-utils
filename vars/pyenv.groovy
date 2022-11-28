@@ -12,3 +12,14 @@ import com.ableton.VirtualEnv
 VirtualEnv createVirtualEnv(String pythonVersion, String pyenvRoot = null) {
   return new Pyenv(this, pyenvRoot ?: env.PYENV_ROOT).createVirtualEnv(pythonVersion)
 }
+
+
+/**
+ * Check if a given Python version is supported by the installed pyenv version.
+ *
+ * @param pythonVersion Python version.
+ * @return True if the Python version is available, false otherwise.
+ */
+boolean versionSupported(String pythonVersion, String pyenvRoot = null) {
+  return new Pyenv(this, pyenvRoot ?: env.PYENV_ROOT).versionSupported(pythonVersion)
+}
