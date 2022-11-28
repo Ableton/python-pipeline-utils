@@ -1,7 +1,9 @@
 package com.ableton
 
+import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertThrows
+import static org.junit.jupiter.api.Assertions.assertTrue
 
 import com.lesfurets.jenkins.unit.BasePipelineTest
 import org.junit.jupiter.api.BeforeEach
@@ -66,5 +68,28 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('isUnix', []) { return false }
 
     assertThrows(Exception) { new Pyenv(script, 'C:\\pyenv').createVirtualEnv('1.2.3') }
+  }
+
+  @Test
+  void versionSupported() {
+    // Resembles pyenv's output, at least as of version 2.3.x
+    String mockPyenvVersions = '''Available versions:
+  2.1.3
+  2.2.3
+  2.3.7
+'''
+    helper.addShMock('/pyenv/bin/pyenv install --list', mockPyenvVersions, 0)
+    helper.registerAllowedMethod('fileExists', [String]) { return true }
+    helper.registerAllowedMethod('isUnix', []) { return true }
+
+    assertTrue(new Pyenv(script, '/pyenv').versionSupported('2.1.3'))
+    assertFalse(new Pyenv(script, '/pyenv').versionSupported('2.1.3333'))
+  }
+
+  @Test
+  void versionSupportedWindows() {
+    helper.registerAllowedMethod('isUnix', []) { return false }
+
+    assertThrows(Exception) { new Pyenv(script, 'C:\\pyenv').versionSupported('1.2.3') }
   }
 }

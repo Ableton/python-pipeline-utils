@@ -61,6 +61,39 @@ class Pyenv implements Serializable {
     return venv
   }
 
+  /**
+   * Check if a given Python version is supported by the installed pyenv version.
+   *
+   * @param pythonVersion Python version.
+   * @return True if the Python version is available, false otherwise.
+   */
+  boolean versionSupported(String pythonVersion) {
+    assert script
+    assert pythonVersion
+    assertPyenvRoot()
+    boolean result = false
+
+    if (!script.isUnix()) {
+      script.error 'This method is not supported on Windows'
+    }
+
+    script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
+      String allVersions = script.sh(
+        label: 'Get Python versions supported by Pyenv',
+        returnStdout: true,
+        script: "${pyenvRoot}/bin/pyenv install --list",
+      )
+
+      allVersions.split('\n').each { version ->
+        if (version.trim() == pythonVersion) {
+          result = true
+        }
+      }
+    }
+
+    return result
+  }
+
   protected void assertPyenvRoot() {
     assert pyenvRoot
 
