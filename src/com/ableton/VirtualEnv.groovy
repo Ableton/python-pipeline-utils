@@ -86,7 +86,9 @@ class VirtualEnv implements Serializable {
    * @param body Closure body to execute.
    */
   void inside(Closure body) {
-    script.withEnv(["PATH+VENVBIN=${venvBinDir}"]) { body() }
+    script.withEnv(["PATH+VENVBIN=${venvBinDir}", "VIRTUAL_ENV=${venvRootDir}"]) {
+      body()
+    }
   }
 
   /**
