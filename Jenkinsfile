@@ -6,7 +6,7 @@ library "python-utils@${params.JENKINS_COMMIT}"
 
 devToolsProject.run(
   test: { data ->
-    parallel(failFast: false,
+    parallel(
       groovydoc: { data['docs'] = groovydoc.generate() },
       groovylint: { groovylint.check('./Jenkinsfile,./*.gradle,**/*.groovy') },
       junit: {
@@ -24,7 +24,7 @@ devToolsProject.run(
 )
 
 eventRecorder.timedStage('Integration Test') {
-  Map stages = [failFast: false]
+  Map stages = [:]
   Map preinstalledPythonVersions = [linux: '3.10', mac: '3.9', win: '3.7']
 
   ['linux', 'mac', 'win'].each { osType ->
