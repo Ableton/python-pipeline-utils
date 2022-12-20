@@ -34,7 +34,7 @@ class Pyenv implements Serializable {
    * @param pythonVersion Python version, as given by pyenv versions --list.
    * @return New instance of VirtualEnv object.
    */
-  VirtualEnv createVirtualEnv(String pythonVersion) {
+  VirtualEnv createVirtualEnv(String pythonVersion, long randomSeed = 0) {
     assert script
     assert pythonVersion
     assertPyenvRoot()
@@ -43,7 +43,7 @@ class Pyenv implements Serializable {
       script.error 'This method is not supported on Windows'
     }
 
-    VirtualEnv venv = new VirtualEnv(script)
+    VirtualEnv venv = new VirtualEnv(script, randomSeed)
     venv.script.sh(
       label: "Install Python version ${pythonVersion} with pyenv",
       script: """
