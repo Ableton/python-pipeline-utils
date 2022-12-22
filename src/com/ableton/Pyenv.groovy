@@ -34,7 +34,7 @@ class Pyenv implements Serializable {
    * @param pythonVersion Python version, as given by pyenv versions --list.
    * @return New instance of VirtualEnv object.
    */
-  VirtualEnv createVirtualEnv(String pythonVersion) {
+  VirtualEnv createVirtualEnv(String pythonVersion, long randomSeed = 0) {
     assert script
     assert pythonVersion
     assertPyenvRoot()
@@ -43,9 +43,10 @@ class Pyenv implements Serializable {
       script.error 'This method is not supported on Windows'
     }
 
-    VirtualEnv venv = new VirtualEnv(script)
-    venv.script.sh(
+    VirtualEnv venv = new VirtualEnv(script, randomSeed)
+    int result = venv.script.sh(
       label: "Install Python version ${pythonVersion} with pyenv",
+      returnStatus: true,
       script: """
         export PYENV_ROOT=${pyenvRoot}
         export PATH=\$PYENV_ROOT/bin:\$PATH
@@ -57,6 +58,21 @@ class Pyenv implements Serializable {
         virtualenv ${venv.venvRootDir}
       """,
     )
+
+    // If we failed to create the virtualenv, test to see if the requested Python version
+    // is supported. We don't do this pre-emptively to spare some work in the pipeline,
+    // but if the above operation failed, it is nice to fail with a clear error message.
+    if (result != 0 && !versionSupported(pythonVersion)) {
+      script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
+        String pyenvVersion = script.sh(
+          label: 'Get Pyenv version on the node',
+          returnStdout: true,
+          script: "${pyenvRoot}/bin/pyenv --version",
+        ).trim()
+        script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
+          "support Python version ${pythonVersion}"
+      }
+    }
 
     return venv
   }
