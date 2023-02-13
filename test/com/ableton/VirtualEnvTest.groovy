@@ -42,12 +42,23 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void create() {
+  void create2() {
     String python = 'python2.7'
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
     helper.addShMock("virtualenv --python=${python} ${venv.venvRootDir}", '', 0)
+    VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
+    assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
+  }
+
+  @Test
+  void create3() {
+    String python = 'python3.9'
+
+    VirtualEnv venv = new VirtualEnv(script, 1)
+
+    helper.addShMock("${python} -mvenv ${venv.venvRootDir}", '', 0)
     VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
     assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
   }

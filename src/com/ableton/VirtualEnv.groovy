@@ -36,6 +36,9 @@ class VirtualEnv implements Serializable {
   static VirtualEnv create(Object script, String python, long randomSeed = 0) {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     String createCmd = "virtualenv --python=${python} ${venv.venvRootDir}"
+    if (python.contains('python3')) {
+      createCmd = "${python} -mvenv ${venv.venvRootDir}"
+    }
     venv.script.sh(label: "Create virtualenv for ${python}", script: createCmd)
     return venv
   }
