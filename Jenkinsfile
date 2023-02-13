@@ -29,7 +29,12 @@ eventRecorder.timedStage('Integration Test') {
 
   ['linux', 'mac', 'win'].each { osType ->
     stages[osType.capitalize()] = {
-      eventRecorder.timedNode("generic-${osType}") {
+      // TODO: Fix this once the 12.5 (and newer) Macs are working
+      String nodeLabel = "generic-${osType}"
+      if (osType == 'mac') {
+        nodeLabel = 'generic-mac-xcode12.2'
+      }
+      eventRecorder.timedNode(nodeLabel) {
         echo 'Test VirtualEnv.create'
         String preinstalledPythonVersion = preinstalledPythonVersions[osType]
         Object venv = virtualenv.create("python${preinstalledPythonVersion}")
