@@ -3,7 +3,9 @@ pull_requests:
 
 pushes:
   - master
+  - nre/master/modern-virtualenv-syntax
 
+jenkins_url: https://ci-staging.office.ableton.com
 notifications:
   - name: Build failures on the main branch
     branch: master
