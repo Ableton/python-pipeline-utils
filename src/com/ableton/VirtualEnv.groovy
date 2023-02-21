@@ -27,8 +27,7 @@ class VirtualEnv implements Serializable {
   /**
    * Create a virtualenv using a specific locally installed version of Python.
    *
-   * @param script Script context.
-   *               <strong>Required value, may not be null!</strong>
+   * @param script Script context. <strong>Required value, may not be null!</strong>
    * @param python Python version or absolute path to Python executable.
    * @param randomSeed If non-zero, use this seed for the random number generator.
    * @return New instance of VirtualEnv object.
