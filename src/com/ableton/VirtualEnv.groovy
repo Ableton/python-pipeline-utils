@@ -34,10 +34,18 @@ class VirtualEnv implements Serializable {
    */
   static VirtualEnv create(Object script, String python, long randomSeed = 0) {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
-    venv.script.sh(
-      label: "Create virtualenv for ${python}",
-      script: "virtualenv --python=${python} ${venv.venvRootDir}",
-    )
+    String venvCommand = "virtualenv --python=${python} ${venv.venvRootDir}"
+
+    if (script.isUnix()) {
+      String pythonVersion = script.sh(
+        label: 'Get Python version', script: "${python} --version", returnStdout: true
+      )
+      if (pythonVersion.contains('Python 3')) {
+        venvCommand = "${python} -m venv ${venv.venvRootDir}"
+      }
+    }
+
+    script.sh(label: "Create virtualenv for ${python}", script: venvCommand)
     return venv
   }
 
