@@ -12,7 +12,7 @@ dependencies {
   compile 'org.codehaus.groovy:groovy-all:2.4.14'
 
   testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.17'
-  testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 }
 
 sourceSets {
