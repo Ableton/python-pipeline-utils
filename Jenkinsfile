@@ -1,10 +1,11 @@
-library(identifier: 'ableton-utils@0.22', changelog: false)
+library(identifier: 'ableton-utils@0.23', changelog: false)
 library(identifier: 'groovylint@0.13', changelog: false)
 // Get python-utils library from current commit so it can test itself in this Jenkinsfile
 library "python-utils@${params.JENKINS_COMMIT}"
 
 
 devToolsProject.run(
+  defaultBranch: 'master',
   test: { data ->
     parallel(
       groovydoc: { data['docs'] = groovydoc.generate() },
@@ -56,9 +57,9 @@ eventRecorder.timedStage('Integration Test') {
   parallel(stages)
 }
 
-if (devToolsProject.shouldDeploy()) {
+if (runTheBuilds.isPushTo(['master'])) {
   devToolsProject.run(
-    deployWhen: { return true },
+    defaultBranch: 'master',
     deploy: { data ->
       String versionNumber = readFile('VERSION').trim()
       version.tag(versionNumber)
