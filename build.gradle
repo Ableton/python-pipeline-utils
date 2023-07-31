@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-  compile 'com.cloudbees:groovy-cps:1+'
-  compile 'org.codehaus.groovy:groovy-all:2.4.14'
+  implementation 'org.codehaus.groovy:groovy-all:2.4.21'
+  implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:3726.v83f8cff396c9'
 
   testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.17'
   testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'

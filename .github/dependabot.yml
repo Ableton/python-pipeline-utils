@@ -10,4 +10,4 @@ updates:
       - dependency-name: org.codehaus.groovy:groovy-all
         versions:
           # This is the version of Groovy that ships with Jenkins 2.x
-          - "> 2.4.12"
+          - "> 2.4"
