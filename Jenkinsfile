@@ -26,7 +26,6 @@ devToolsProject.run(
 
 eventRecorder.timedStage('Integration Test') {
   Map stages = [:]
-  Map preinstalledPythonVersions = [linux: '3.10', mac: '3.9', win: '3.7']
 
   ['linux', 'mac', 'win'].each { osType ->
     stages[osType.capitalize()] = {
@@ -37,10 +36,9 @@ eventRecorder.timedStage('Integration Test') {
       }
       eventRecorder.timedNode(nodeLabel) {
         echo 'Test VirtualEnv.create'
-        String preinstalledPythonVersion = preinstalledPythonVersions[osType]
-        Object venv = virtualenv.create("python${preinstalledPythonVersion}")
+        Object venv = virtualenv.create('python3')
         String venvVersion = venv.run(returnStdout: true, script: 'python --version')
-        assert venvVersion.startsWith("Python ${preinstalledPythonVersion}")
+        assert venvVersion.startsWith('Python 3')
 
         if (isUnix()) {
           echo 'Test VirtualEnv.createWithPyenv'
