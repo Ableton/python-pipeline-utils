@@ -69,8 +69,8 @@ class Pyenv implements Serializable {
         'eval "\$(pyenv init -)"',
         "pyenv install --skip-existing ${trimmedPythonVersion}",
         "pyenv shell ${trimmedPythonVersion}",
-        'pip install virtualenv',
-        "virtualenv ${venv.venvRootDir}",
+        'pyenv exec pip install virtualenv',
+        "pyenv exec virtualenv ${venv.venvRootDir}",
       ]
       venv.script.sh(
         label: "Install Python version ${trimmedPythonVersion} with pyenv",
