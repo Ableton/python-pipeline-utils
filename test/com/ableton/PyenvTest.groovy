@@ -152,7 +152,6 @@ class PyenvTest extends BasePipelineTest {
       'eval "\$(pyenv init --path)"',
       'eval "\$(pyenv init -)"',
       "pyenv install --skip-existing ${pythonVersion}",
-      "pyenv shell ${pythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv /workspace/.venv/${TEST_RANDOM_NAME}",
     ]
