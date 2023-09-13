@@ -44,21 +44,23 @@ class Pyenv implements Serializable {
     }
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
-    List installCommands = [
-      "export PYENV_ROOT=${pyenvRoot}",
-      "export PATH=\$PYENV_ROOT/bin:\$PATH",
-      "eval \"\$(pyenv init --path)\"",
-      "eval \"\$(pyenv init -)\"",
-      "pyenv install --skip-existing ${pythonVersion}",
-      "pyenv shell ${pythonVersion}",
-      'pyenv exec pip install virtualenv',
-      "pyenv exec virtualenv ${venv.venvRootDir}",
-    ]
-    int result = venv.script.sh(
-      label: "Install Python version ${pythonVersion} with pyenv",
-      returnStatus: true,
-      script: installCommands.join('\n') + '\n',
-    )
+    int result
+    script.withEnv(["PYENV_VERSION=${pythonVersion}"]) {
+      List installCommands = [
+        "export PYENV_ROOT=${pyenvRoot}",
+        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        "eval \"\$(pyenv init --path)\"",
+        "eval \"\$(pyenv init -)\"",
+        "pyenv install --skip-existing ${pythonVersion}",
+        'pyenv exec pip install virtualenv',
+        "pyenv exec virtualenv ${venv.venvRootDir}",
+      ]
+      result = venv.script.sh(
+        label: "Install Python version ${pythonVersion} with pyenv",
+        returnStatus: true,
+        script: installCommands.join('\n') + '\n',
+      )
+    }
 
     if (result != 0) {
       // If we failed to create the virtualenv, test to see if the requested Python
