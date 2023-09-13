@@ -62,20 +62,21 @@ class Pyenv implements Serializable {
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.retry(INSTALLATION_RETRIES) {
-      List installCommands = [
-        "export PYENV_ROOT=${pyenvRoot}",
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
-        'eval "\$(pyenv init --path)"',
-        'eval "\$(pyenv init -)"',
-        "pyenv install --skip-existing ${trimmedPythonVersion}",
-        "pyenv shell ${trimmedPythonVersion}",
-        'pyenv exec pip install virtualenv',
-        "pyenv exec virtualenv ${venv.venvRootDir}",
-      ]
-      venv.script.sh(
-        label: "Install Python version ${trimmedPythonVersion} with pyenv",
-        script: installCommands.join('\n') + '\n',
-      )
+      script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
+        List installCommands = [
+          "export PYENV_ROOT=${pyenvRoot}",
+          "export PATH=\$PYENV_ROOT/bin:\$PATH",
+          'eval "\$(pyenv init --path)"',
+          'eval "\$(pyenv init -)"',
+          "pyenv install --skip-existing ${trimmedPythonVersion}",
+          'pyenv exec pip install virtualenv',
+          "pyenv exec virtualenv ${venv.venvRootDir}",
+        ]
+        venv.script.sh(
+          label: "Install Python version ${trimmedPythonVersion} with pyenv",
+          script: installCommands.join('\n') + '\n',
+        )
+      }
     }
 
     return venv
