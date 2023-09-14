@@ -120,8 +120,8 @@ class Pyenv implements Serializable {
   protected void assertPyenvRoot() {
     assert pyenvRoot
 
-    if (!script.fileExists(pyenvRoot)) {
-      script.error "pyenv root path '${pyenvRoot}' does not exist"
+    if (script.sh(returnStatus: true, script: "${pyenvRoot}/bin/pyenv --version")) {
+      script.error "pyenv executable not found in '${pyenvRoot}'"
     }
   }
 }
