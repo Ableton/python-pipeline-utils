@@ -199,12 +199,13 @@ class PyenvTest extends BasePipelineTest {
   2.2.3
   2.3.7
 '''
-    helper.addShMock('/pyenv/bin/pyenv install --list', mockPyenvVersions, 0)
+    String pyenvRoot = '/pyenv'
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", mockPyenvVersions, 0)
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
 
-    assertTrue(new Pyenv(script, '/pyenv').versionSupported('2.1.3'))
-    assertFalse(new Pyenv(script, '/pyenv').versionSupported('2.1.3333'))
+    assertTrue(new Pyenv(script, pyenvRoot).versionSupported('2.1.3'))
+    assertFalse(new Pyenv(script, pyenvRoot).versionSupported('2.1.3333'))
   }
 
   @Test
