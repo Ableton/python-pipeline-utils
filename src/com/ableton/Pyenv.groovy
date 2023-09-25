@@ -39,18 +39,20 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
 
-    if (!script.isUnix()) {
-      script.error 'This method is not supported on Windows'
-    }
-
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     int result
     script.withEnv(["PYENV_VERSION=${pythonVersion}"]) {
-      List installCommands = [
-        "export PYENV_ROOT=${pyenvRoot}",
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
-        "eval \"\$(pyenv init --path)\"",
-        "eval \"\$(pyenv init -)\"",
+      List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
+      if (script.isUnix()) {
+        installCommands += [
+          "export PATH=\$PYENV_ROOT/bin:\$PATH",
+          "eval \"\$(pyenv init --path)\"",
+          "eval \"\$(pyenv init -)\"",
+        ]
+      } else {
+        installCommands.add("export PATH=${pyenvRoot}/shims:${pyenvRoot}/bin:\$PATH")
+      }
+      installCommands += [
         "pyenv install --skip-existing ${pythonVersion}",
         'pyenv exec pip install virtualenv',
         "pyenv exec virtualenv ${venv.venvRootDir}",
@@ -95,10 +97,6 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
     boolean result = false
-
-    if (!script.isUnix()) {
-      script.error 'This method is not supported on Windows'
-    }
 
     script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
       String allVersions = script.sh(
