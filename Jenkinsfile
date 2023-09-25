@@ -43,10 +43,10 @@ eventRecorder.timedStage('Integration Test') {
         assert venvVersion.startsWith('Python 3')
 
         echo 'Test VirtualEnv.createWithPyenv'
-        Object pyvenv = pyenv.createVirtualEnv('3.10.3')
+        Object pyvenv = pyenv.createVirtualEnv('3.10.2')
         String pyvenvVersion = pyvenv.run(returnStdout: true, script: 'python --version')
         echo pyvenvVersion
-        assert pyvenvVersion.trim() == 'Python 3.10.3'
+        assert pyvenvVersion.trim() == 'Python 3.10.2'
       }
     }
   }
