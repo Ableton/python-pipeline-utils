@@ -21,7 +21,7 @@ class Pyenv implements Serializable {
 
   Pyenv(Object script, String pyenvRoot) {
     this.script = script
-    this.pyenvRoot = pyenvRoot
+    this.pyenvRoot = pyenvRoot ? VirtualEnv.posixPath(pyenvRoot) : null
   }
 
   /**
