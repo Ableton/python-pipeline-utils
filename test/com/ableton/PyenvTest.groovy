@@ -97,7 +97,7 @@ class PyenvTest extends BasePipelineTest {
 
     new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
 
-    assertFalse(errorCalled)
+    assertTrue(errorCalled)
   }
 
   @Test
