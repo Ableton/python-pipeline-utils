@@ -59,18 +59,22 @@ class Pyenv implements Serializable {
       """,
     )
 
-    // If we failed to create the virtualenv, test to see if the requested Python version
-    // is supported. We don't do this pre-emptively to spare some work in the pipeline,
-    // but if the above operation failed, it is nice to fail with a clear error message.
-    if (result != 0 && !versionSupported(pythonVersion)) {
-      script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
-        String pyenvVersion = script.sh(
-          label: 'Get Pyenv version on the node',
-          returnStdout: true,
-          script: "${pyenvRoot}/bin/pyenv --version",
-        ).trim()
-        script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
-          "support Python version ${pythonVersion}"
+    if (result != 0) {
+      // If we failed to create the virtualenv, test to see if the requested Python
+      // version is supported. We don't do this pre-emptively to spare some work in the
+      // pipeline, but if the operation failed, it is nice to fail with a clear error.
+      if (versionSupported(pythonVersion)) {
+        script.error "Installation of Python ${pythonVersion} failed with code ${result}"
+      } else {
+        script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
+          String pyenvVersion = script.sh(
+            label: 'Get Pyenv version on the node',
+            returnStdout: true,
+            script: "${pyenvRoot}/bin/pyenv --version",
+          ).trim()
+          script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
+            "support Python version ${pythonVersion}"
+        }
       }
     }
 
