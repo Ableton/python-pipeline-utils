@@ -1,11 +1,11 @@
 pull_requests:
-  - master
+  - main
 
 pushes:
-  - master
+  - main
 
 notifications:
   - name: Build failures on the main branch
-    branch: master
+    branch: main
     slack:
       - GJUMRCZKQ
