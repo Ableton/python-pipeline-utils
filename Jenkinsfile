@@ -5,7 +5,7 @@ library "python-utils@${params.JENKINS_COMMIT}"
 
 
 devToolsProject.run(
-  defaultBranch: 'master',
+  defaultBranch: 'main',
   test: { data ->
     parallel(
       groovydoc: { data['docs'] = groovydoc.generate() },
@@ -55,9 +55,9 @@ eventRecorder.timedStage('Integration Test') {
   parallel(stages)
 }
 
-if (runTheBuilds.isPushTo(['master'])) {
+if (runTheBuilds.isPushTo(['main'])) {
   devToolsProject.run(
-    defaultBranch: 'master',
+    defaultBranch: 'main',
     deploy: { data ->
       String versionNumber = readFile('VERSION').trim()
       version.tag(versionNumber)
