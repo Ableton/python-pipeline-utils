@@ -25,6 +25,8 @@ The `pyenv` singleton can be used to create a Python Virtualenv in combination w
 [pyenv][pyenv]. For this to work, Pyenv must already be installed on the build node.
 
 ```groovy
+@Library('python-pipeline-utils@x.y.z') _
+
 Object venv
 
 stage('Setup with environment variable') {
@@ -64,6 +66,8 @@ The `virtualenv` singleton creates a Python Virtualenv in the project's temporar
 Example usage might look something like this:
 
 ```groovy
+@Library('python-pipeline-utils@x.y.z') _
+
 Object venv
 
 stage('Setup') {
