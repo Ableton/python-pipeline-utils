@@ -39,10 +39,6 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
 
-    if (!script.isUnix()) {
-      script.error 'This method is not supported on Windows'
-    }
-
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     int result = venv.script.sh(
       label: "Install Python version ${pythonVersion} with pyenv",
@@ -92,10 +88,6 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
     boolean result = false
-
-    if (!script.isUnix()) {
-      script.error 'This method is not supported on Windows'
-    }
 
     script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
       String allVersions = script.sh(
