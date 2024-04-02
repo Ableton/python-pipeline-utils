@@ -3,6 +3,7 @@ pull_requests:
 
 pushes:
   - main
+  - ala-test
 
 notifications:
   - name: Build failures on the main branch
