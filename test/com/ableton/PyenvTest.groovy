@@ -84,7 +84,6 @@ class PyenvTest extends BasePipelineTest {
       addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
       // Indentation must match the actual command
       addShMock("""
-        export PYENV_ROOT=${pyenvRoot}
         export PATH=\$PYENV_ROOT/bin:\$PATH
         eval "\$(pyenv init --path)"
         eval "\$(pyenv init -)"
@@ -118,7 +117,6 @@ class PyenvTest extends BasePipelineTest {
     helper.addShMock("${pyenvRoot}/bin/pyenv --version", '1.2.3', 0)
     // Indentation must match the actual command
     helper.addShMock("""
-        export PYENV_ROOT=${pyenvRoot}
         export PATH=\$PYENV_ROOT/bin:\$PATH
         eval "\$(pyenv init --path)"
         eval "\$(pyenv init -)"
