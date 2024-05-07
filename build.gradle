@@ -11,7 +11,7 @@ dependencies {
   implementation 'org.codehaus.groovy:groovy-all:2.4.21'
   implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:3894.3896.vca_2c931e7935'
 
-  testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.19'
+  testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.20'
   testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
