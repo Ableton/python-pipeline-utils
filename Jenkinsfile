@@ -1,5 +1,5 @@
 library(identifier: 'ableton-utils@0.23', changelog: false)
-library(identifier: 'groovylint@0.13', changelog: false)
+library(identifier: 'groovylint@0.15', changelog: false)
 // Get python-utils library from current commit so it can test itself in this Jenkinsfile
 library "python-utils@${params.JENKINS_COMMIT}"
 
