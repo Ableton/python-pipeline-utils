@@ -35,19 +35,18 @@ eventRecorder.timedStage('Integration Test') {
         nodeLabel = 'generic-mac-xcode12.2'
       }
       eventRecorder.timedNode(nodeLabel) {
+        sh 'env | sort'
+
         echo 'Test VirtualEnv.create'
         Object venv = virtualenv.create('python3')
         String venvVersion = venv.run(returnStdout: true, script: 'python --version')
         assert venvVersion.startsWith('Python 3')
 
-        if (isUnix()) {
-          echo 'Test VirtualEnv.createWithPyenv'
-          Object pyvenv = pyenv.createVirtualEnv('3.10.3')
-          String pyvenvVersion =
-            pyvenv.run(returnStdout: true, script: 'python --version')
-          echo pyvenvVersion
-          assert pyvenvVersion.trim() == 'Python 3.10.3'
-        }
+        echo 'Test VirtualEnv.createWithPyenv'
+        Object pyvenv = pyenv.createVirtualEnv('3.10.2')
+        String pyvenvVersion = pyvenv.run(returnStdout: true, script: 'python --version')
+        echo pyvenvVersion
+        assert pyvenvVersion.trim() == 'Python 3.10.2'
       }
     }
   }
