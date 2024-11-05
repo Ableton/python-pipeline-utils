@@ -65,6 +65,8 @@ class PyenvTest extends BasePipelineTest {
         pip install virtualenv
         virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
       """, '', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
 
