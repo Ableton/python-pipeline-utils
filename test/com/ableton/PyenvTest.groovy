@@ -80,8 +80,10 @@ class PyenvTest extends BasePipelineTest {
       registerAllowedMethod('error', [String]) { errorCalled = true }
       registerAllowedMethod('fileExists', [String]) { return true }
       registerAllowedMethod('isUnix', []) { return true }
-      addShMock("${pyenvRoot}/bin/pyenv --version", '1.2.3', 0)
-      addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+      addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+      addShMock("${pyenvRoot}/bin/pyenv install --list", '''Available versions:
+  1.2.3
+''', 0)
       // Indentation must match the actual command
       addShMock("""
         export PYENV_ROOT=${pyenvRoot}
@@ -115,7 +117,7 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('error', [String]) { errorCalled = true }
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock("${pyenvRoot}/bin/pyenv --version", '1.2.3', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
     // Indentation must match the actual command
     helper.addShMock("""
         export PYENV_ROOT=${pyenvRoot}
