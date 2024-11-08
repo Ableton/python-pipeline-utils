@@ -74,6 +74,31 @@ class PyenvTest extends BasePipelineTest {
   }
 
   @Test
+  void createVirtualEnvWithTrailingNewline() {
+    String pythonVersion = '1.2.3\n'
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.registerAllowedMethod('fileExists', [String]) { return true }
+    helper.registerAllowedMethod('isUnix', []) { return true }
+    // Indentation must match the actual command
+    helper.addShMock("""
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
+      """, '', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+
+    Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+
+    assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+  }
+
+  @Test
   void createVirtualEnvInstallationFails() {
     String pythonVersion = '1.2.3'
     String pyenvRoot = '/mock/pyenv/root'
