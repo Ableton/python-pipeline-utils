@@ -8,6 +8,8 @@ package com.ableton
  * @see com.ableton.VirtualEnv
  */
 class Pyenv implements Serializable {
+  static private final int INSTALLATION_RETRIES = 3
+
   /**
    * Script context.
    * <strong>Required value, may not be null!</strong>
@@ -28,6 +30,7 @@ class Pyenv implements Serializable {
    * Create a virtualenv using a specific version of Python, installed via pyenv. pyenv
    * should be installed on the node, but the actual setup of any required environment
    * variables (e.g. PYENV_ROOT and PATH) will be done inside this function.
+   * The Python installation will be retried up to three times.
    *
    * @param script Script context.
    *               <strong>Required value, may not be null!</strong>
@@ -43,39 +46,33 @@ class Pyenv implements Serializable {
       script.error 'This method is not supported on Windows'
     }
 
-    VirtualEnv venv = new VirtualEnv(script, randomSeed)
-    int result = venv.script.sh(
-      label: "Install Python version ${pythonVersion} with pyenv",
-      returnStatus: true,
-      script: """
-        export PYENV_ROOT=${pyenvRoot}
-        export PATH=\$PYENV_ROOT/bin:\$PATH
-        eval "\$(pyenv init --path)"
-        eval "\$(pyenv init -)"
-        pyenv install --skip-existing ${pythonVersion}
-        pyenv shell ${pythonVersion}
-        pip install virtualenv
-        virtualenv ${venv.venvRootDir}
-      """,
-    )
-
-    if (result != 0) {
-      // If we failed to create the virtualenv, test to see if the requested Python
-      // version is supported. We don't do this pre-emptively to spare some work in the
-      // pipeline, but if the operation failed, it is nice to fail with a clear error.
-      if (versionSupported(pythonVersion)) {
-        script.error "Installation of Python ${pythonVersion} failed with code ${result}"
-      } else {
-        script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
-          String pyenvVersion = script.sh(
-            label: 'Get Pyenv version on the node',
-            returnStdout: true,
-            script: "${pyenvRoot}/bin/pyenv --version",
-          ).trim()
-          script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
-            "support Python version ${pythonVersion}"
-        }
+    if (!versionSupported(pythonVersion)) {
+      script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
+        String pyenvVersion = script.sh(
+          label: 'Get Pyenv version on the node',
+          returnStdout: true,
+          script: "${pyenvRoot}/bin/pyenv --version",
+        ).trim()
+        script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
+          "support Python version ${pythonVersion}"
       }
+    }
+
+    VirtualEnv venv = new VirtualEnv(script, randomSeed)
+    script.retry(INSTALLATION_RETRIES) {
+      venv.script.sh(
+        label: "Install Python version ${pythonVersion} with pyenv",
+        script: """
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv ${venv.venvRootDir}
+      """,
+      )
     }
 
     return venv

@@ -56,15 +56,17 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('isUnix', []) { return true }
     // Indentation must match the actual command
     helper.addShMock("""
-        export PYENV_ROOT=${pyenvRoot}
-        export PATH=\$PYENV_ROOT/bin:\$PATH
-        eval "\$(pyenv init --path)"
-        eval "\$(pyenv init -)"
-        pyenv install --skip-existing ${pythonVersion}
-        pyenv shell ${pythonVersion}
-        pip install virtualenv
-        virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
       """, '', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
 
@@ -72,32 +74,64 @@ class PyenvTest extends BasePipelineTest {
   }
 
   @Test
+  void createVirtualEnvInstallationFails() {
+    String pythonVersion = '1.2.3'
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.with {
+      registerAllowedMethod('fileExists', [String]) { return true }
+      registerAllowedMethod('isUnix', []) { return true }
+      // Indentation must match the actual command
+      addShMock("""
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
+      """, '', 1)
+      addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+      addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+    }
+
+    assertThrows(Exception) {
+      new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+    }
+
+    assertEquals(3, helper.callStack.findAll { call ->
+      call.methodName == 'sh' &&
+        call.args[0].label == 'Install Python version 1.2.3 with pyenv'
+    }.size())
+  }
+
+  @Test
   void createVirtualEnvFailedSupportedPythonVersion() {
     String pythonVersion = '1.2.3'
     String pyenvRoot = '/mock/pyenv/root'
-    boolean errorCalled = false
     helper.with {
-      registerAllowedMethod('error', [String]) { errorCalled = true }
       registerAllowedMethod('fileExists', [String]) { return true }
       registerAllowedMethod('isUnix', []) { return true }
-      addShMock("${pyenvRoot}/bin/pyenv --version", '1.2.3', 0)
-      addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+      addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+      addShMock("${pyenvRoot}/bin/pyenv install --list", '''Available versions:
+  1.2.3
+''', 0)
       // Indentation must match the actual command
       addShMock("""
-        export PYENV_ROOT=${pyenvRoot}
-        export PATH=\$PYENV_ROOT/bin:\$PATH
-        eval "\$(pyenv init --path)"
-        eval "\$(pyenv init -)"
-        pyenv install --skip-existing ${pythonVersion}
-        pyenv shell ${pythonVersion}
-        pip install virtualenv
-        virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
       """, '', 1)
     }
 
-    new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
-
-    assertTrue(errorCalled)
+    assertThrows(Exception) {
+      new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+    }
   }
 
   @Test
@@ -111,26 +145,25 @@ class PyenvTest extends BasePipelineTest {
   void createVirtualEnvUnsupportedPythonVersion() {
     String pythonVersion = '6.6.6'
     String pyenvRoot = '/mock/pyenv/root'
-    boolean errorCalled = false
     helper.registerAllowedMethod('error', [String]) { errorCalled = true }
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock("${pyenvRoot}/bin/pyenv --version", '1.2.3', 0)
+    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
     // Indentation must match the actual command
     helper.addShMock("""
-        export PYENV_ROOT=${pyenvRoot}
-        export PATH=\$PYENV_ROOT/bin:\$PATH
-        eval "\$(pyenv init --path)"
-        eval "\$(pyenv init -)"
-        pyenv install --skip-existing ${pythonVersion}
-        pyenv shell ${pythonVersion}
-        pip install virtualenv
-        virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
+          export PYENV_ROOT=${pyenvRoot}
+          export PATH=\$PYENV_ROOT/bin:\$PATH
+          eval "\$(pyenv init --path)"
+          eval "\$(pyenv init -)"
+          pyenv install --skip-existing ${pythonVersion}
+          pyenv shell ${pythonVersion}
+          pip install virtualenv
+          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
       """, '', 1)
 
-    new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
-
-    assertTrue(errorCalled)
+    assertThrows(Exception) {
+      new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+    }
   }
 
   @Test
