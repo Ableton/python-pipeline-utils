@@ -42,11 +42,13 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
 
+    String trimmedPythonVersion = pythonVersion.trim()
+
     if (!script.isUnix()) {
       script.error 'This method is not supported on Windows'
     }
 
-    if (!versionSupported(pythonVersion)) {
+    if (!versionSupported(trimmedPythonVersion)) {
       script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
         String pyenvVersion = script.sh(
           label: 'Get Pyenv version on the node',
@@ -54,21 +56,21 @@ class Pyenv implements Serializable {
           script: "${pyenvRoot}/bin/pyenv --version",
         ).trim()
         script.error "The installed version of Pyenv (${pyenvVersion}) does not " +
-          "support Python version ${pythonVersion}"
+          "support Python version ${trimmedPythonVersion}"
       }
     }
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.retry(INSTALLATION_RETRIES) {
       venv.script.sh(
-        label: "Install Python version ${pythonVersion} with pyenv",
+        label: "Install Python version ${trimmedPythonVersion} with pyenv",
         script: """
           export PYENV_ROOT=${pyenvRoot}
           export PATH=\$PYENV_ROOT/bin:\$PATH
           eval "\$(pyenv init --path)"
           eval "\$(pyenv init -)"
-          pyenv install --skip-existing ${pythonVersion}
-          pyenv shell ${pythonVersion}
+          pyenv install --skip-existing ${trimmedPythonVersion}
+          pyenv shell ${trimmedPythonVersion}
           pip install virtualenv
           virtualenv ${venv.venvRootDir}
       """,
