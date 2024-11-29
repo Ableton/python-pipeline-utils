@@ -166,16 +166,17 @@ class PyenvTest extends BasePipelineTest {
   }
 
   private String installCommands(String pyenvRoot, String pythonVersion) {
-    // Indentation must match the actual command
-    return """
-          export PYENV_ROOT=${pyenvRoot}
-          export PATH=\$PYENV_ROOT/bin:\$PATH
-          eval "\$(pyenv init --path)"
-          eval "\$(pyenv init -)"
-          pyenv install --skip-existing ${pythonVersion}
-          pyenv shell ${pythonVersion}
-          pip install virtualenv
-          virtualenv /workspace/.venv/${TEST_RANDOM_NAME}
-      """
+    List installCommands = [
+      "export PYENV_ROOT=${pyenvRoot}",
+      "export PATH=\$PYENV_ROOT/bin:\$PATH",
+      'eval "\$(pyenv init --path)"',
+      'eval "\$(pyenv init -)"',
+      "pyenv install --skip-existing ${pythonVersion}",
+      "pyenv shell ${pythonVersion}",
+      'pip install virtualenv',
+      "virtualenv /workspace/.venv/${TEST_RANDOM_NAME}",
+    ]
+
+    return installCommands.join('\n') + '\n'
   }
 }
