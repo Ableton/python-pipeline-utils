@@ -120,9 +120,19 @@ class PyenvTest extends BasePipelineTest {
 
   @Test
   void createVirtualEnvWindows() {
+    String pythonVersion = '1.2.3'
+    String pyenvRoot = 'C:\\mock\\pyenv\\root'
+    String cygwinPyenvRoot = '/c/mock/pyenv/root'
     helper.registerAllowedMethod('isUnix', []) { return false }
+    helper.addShMock("${cygwinPyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+    helper.addShMock("${cygwinPyenvRoot}/bin/pyenv install --list", '''Available versions:
+  1.2.3
+''', 0)
+    helper.addShMock(installCommands(cygwinPyenvRoot, pythonVersion, false), '', 0)
 
-    assertThrows(Exception) { new Pyenv(script, 'C:\\pyenv').createVirtualEnv('1.2.3') }
+    Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+
+    assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -158,17 +168,35 @@ class PyenvTest extends BasePipelineTest {
 
   @Test
   void versionSupportedWindows() {
+    // Resembles pyenv's output, at least as of version 2.3.x
+    String mockPyenvVersions = '''Available versions:
+  2.1.3
+  2.2.3
+  2.3.7
+'''
+    String cygwinPyenvRoot = '/c/pyenv'
+    helper.addShMock("${cygwinPyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
+    helper.addShMock("${cygwinPyenvRoot}/bin/pyenv install --list", mockPyenvVersions, 0)
     helper.registerAllowedMethod('isUnix', []) { return false }
 
-    assertThrows(Exception) { new Pyenv(script, 'C:\\pyenv').versionSupported('1.2.3') }
+    assertTrue(new Pyenv(script, cygwinPyenvRoot).versionSupported('2.1.3'))
+    assertFalse(new Pyenv(script, cygwinPyenvRoot).versionSupported('2.1.3333'))
   }
 
-  private String installCommands(String pyenvRoot, String pythonVersion) {
+  private String installCommands(
+    String pyenvRoot, String pythonVersion, boolean isUnix = true
+  ) {
     List installCommands = [
       "export PYENV_ROOT=${pyenvRoot}",
       "export PATH=\$PYENV_ROOT/bin:\$PATH",
-      "eval \"\$(pyenv init --path)\"",
-      "eval \"\$(pyenv init -)\"",
+    ]
+    if (isUnix) {
+      installCommands += [
+        "eval \"\$(pyenv init --path)\"",
+        "eval \"\$(pyenv init -)\"",
+      ]
+    }
+    installCommands += [
       "pyenv install --skip-existing ${pythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv /workspace/.venv/${TEST_RANDOM_NAME}",
