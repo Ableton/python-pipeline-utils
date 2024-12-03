@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
   implementation 'org.codehaus.groovy:groovy-all:2.4.21'
-  implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:3996.va_f5c1799f978'
+  implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:4000.v5198556e9cea_'
 
   testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.24'
   testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
