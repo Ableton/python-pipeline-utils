@@ -12,7 +12,7 @@ dependencies {
   implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:4032.vf3248d9c3fee'
 
   testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.26'
-  testImplementation 'org.junit.jupiter:junit-jupiter:5.12.0'
+  testImplementation 'org.junit.jupiter:junit-jupiter:5.12.1'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
