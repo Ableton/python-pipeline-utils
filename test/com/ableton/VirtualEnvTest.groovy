@@ -87,7 +87,7 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv)
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
-    assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+    assertEquals("/c/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
 
   @Test
@@ -122,6 +122,14 @@ class VirtualEnvTest extends BasePipelineTest {
       assertNotNull(error)
     }
     assertTrue(exceptionThrown)
+  }
+
+  @Test
+  void posixPath() {
+    assertEquals('/c/foo/bar', VirtualEnv.posixPath('/c/foo/bar'))
+    assertEquals('/c/foo/bar', VirtualEnv.posixPath('C:\\foo\\bar'))
+    assertEquals('foo/bar', VirtualEnv.posixPath('foo\\bar'))
+    assertEquals('foo/bar', VirtualEnv.posixPath('foo/bar'))
   }
 
   @Test
