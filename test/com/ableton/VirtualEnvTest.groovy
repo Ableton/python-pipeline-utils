@@ -54,7 +54,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void inside() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
     Map insideEnv
 
     new VirtualEnv(script, 1).inside { insideEnv = binding.getVariable('env') }
@@ -67,8 +66,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectUnix() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
     VirtualEnv venv = new VirtualEnv(script, 1)
 
     assertNotNull(venv)
@@ -79,7 +76,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWindows() {
-    helper.registerAllowedMethod('isUnix', []) { return false }
+    script.env.OS = 'Windows_NT'
     script.env.WORKSPACE = 'C:\\workspace'
 
     VirtualEnv venv = new VirtualEnv(script, 1)
@@ -92,8 +89,6 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWithAbsolutePath() {
-    helper.registerAllowedMethod('isUnix', []) { return true }
-
     VirtualEnv venv = new VirtualEnv(script, 1)
 
     // Expect that the dirname of the python installation is stripped from the
@@ -104,7 +99,7 @@ class VirtualEnvTest extends BasePipelineTest {
 
   @Test
   void newObjectWithAbsolutePathWindows() {
-    helper.registerAllowedMethod('isUnix', []) { return false }
+    script.env.OS = 'Windows_NT'
 
     VirtualEnv venv = new VirtualEnv(script, 1)
 
@@ -136,7 +131,6 @@ class VirtualEnvTest extends BasePipelineTest {
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
-    helper.registerAllowedMethod('isUnix', []) { return true }
 
     new VirtualEnv(script, 1).run('mock-script')
 
@@ -152,7 +146,6 @@ class VirtualEnvTest extends BasePipelineTest {
       mock-script
     '''
     helper.addShMock(mockScriptCall, 'mock output', 0)
-    helper.registerAllowedMethod('isUnix', []) { return true }
 
     new VirtualEnv(script, 1).run(script: 'mock-script')
 
@@ -164,7 +157,6 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStatus() {
     helper.addShMock('mock-script', 'mock output', 1234)
-    helper.registerAllowedMethod('isUnix', []) { return true }
 
     int result = new VirtualEnv(script, 1).run(script: 'mock-script', returnStatus: true)
 
@@ -177,7 +169,6 @@ class VirtualEnvTest extends BasePipelineTest {
   @Test
   void runWithMapReturnStdout() {
     helper.addShMock('mock-script', 'mock output', 0)
-    helper.registerAllowedMethod('isUnix', []) { return true }
 
     String result = new VirtualEnv(script, 1)
       .run(script: 'mock-script', returnStdout: true)
