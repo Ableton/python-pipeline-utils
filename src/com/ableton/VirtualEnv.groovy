@@ -59,11 +59,11 @@ class VirtualEnv implements Serializable {
     String activateSubDir
     String workspace = script.env.WORKSPACE
 
-    if (script.isUnix()) {
-      activateSubDir = 'bin'
-    } else {
+    if (script.env.OS == 'Windows_NT') {
       activateSubDir = 'Scripts'
       workspace = workspace.replace('\\', '/')
+    } else {
+      activateSubDir = 'bin'
     }
 
     long seed = randomSeed ?: System.currentTimeMillis() * this.hashCode()
