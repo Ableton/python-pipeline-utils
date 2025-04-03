@@ -61,6 +61,10 @@ class VirtualEnvTest extends BasePipelineTest {
     assertEquals(
       "/workspace/.venv/${TEST_RANDOM_NAME}/bin" as String, insideEnv['PATH+VENVBIN']
     )
+    assertTrue(insideEnv.keySet().contains('VIRTUAL_ENV'))
+    assertEquals(
+      "/workspace/.venv/${TEST_RANDOM_NAME}" as String, insideEnv['VIRTUAL_ENV']
+    )
   }
 
   @Test
