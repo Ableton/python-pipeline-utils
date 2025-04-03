@@ -52,6 +52,20 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void createWithWindowsPath() {
+    script.env.OS = 'Windows_NT'
+    script.env.WORKSPACE = 'C:\\workspace'
+
+    VirtualEnv.create(script, 'C:\\Python27\\python.exe', 1)
+
+    String expected =
+      "virtualenv --python=C:/Python27/python.exe C:/workspace/.venv/${TEST_RANDOM_NAME}"
+    assertEquals(
+      expected, helper.callStack.find { call -> call.methodName == 'sh' }.args[0].script
+    )
+  }
+
+  @Test
   void inside() {
     Map insideEnv
 
