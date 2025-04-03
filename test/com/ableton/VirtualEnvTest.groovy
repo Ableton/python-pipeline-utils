@@ -1,7 +1,6 @@
 package com.ableton
 
 import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertTrue
 
@@ -53,6 +52,20 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
+  void createWithWindowsPath() {
+    script.env.OS = 'Windows_NT'
+    script.env.WORKSPACE = 'C:\\workspace'
+
+    VirtualEnv.create(script, 'C:\\Python27\\python.exe', 1)
+
+    String expected =
+      "virtualenv --python=C:/Python27/python.exe C:/workspace/.venv/${TEST_RANDOM_NAME}"
+    assertEquals(
+      expected, helper.callStack.find { call -> call.methodName == 'sh' }.args[0].script
+    )
+  }
+
+  @Test
   void inside() {
     Map insideEnv
 
@@ -61,6 +74,10 @@ class VirtualEnvTest extends BasePipelineTest {
     assertTrue(insideEnv.keySet().contains('PATH+VENVBIN'))
     assertEquals(
       "/workspace/.venv/${TEST_RANDOM_NAME}/bin" as String, insideEnv['PATH+VENVBIN']
+    )
+    assertTrue(insideEnv.keySet().contains('VIRTUAL_ENV'))
+    assertEquals(
+      "/workspace/.venv/${TEST_RANDOM_NAME}" as String, insideEnv['VIRTUAL_ENV']
     )
   }
 
@@ -85,26 +102,6 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
     assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
-  }
-
-  @Test
-  void newObjectWithAbsolutePath() {
-    VirtualEnv venv = new VirtualEnv(script, 1)
-
-    // Expect that the dirname of the python installation is stripped from the
-    // virtualenv directory, but that it still retains the correct python version.
-    assertFalse(venv.venvRootDir.contains('usr/bin'))
-    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
-  }
-
-  @Test
-  void newObjectWithAbsolutePathWindows() {
-    script.env.OS = 'Windows_NT'
-
-    VirtualEnv venv = new VirtualEnv(script, 1)
-
-    assertFalse(venv.venvRootDir.startsWith('/c'))
-    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
