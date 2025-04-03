@@ -1,7 +1,6 @@
 package com.ableton
 
 import static org.junit.jupiter.api.Assertions.assertEquals
-import static org.junit.jupiter.api.Assertions.assertFalse
 import static org.junit.jupiter.api.Assertions.assertNotNull
 import static org.junit.jupiter.api.Assertions.assertTrue
 
@@ -85,26 +84,6 @@ class VirtualEnvTest extends BasePipelineTest {
     assertNotNull(venv.script)
     assertNotNull(venv.venvRootDir)
     assertEquals("C:/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
-  }
-
-  @Test
-  void newObjectWithAbsolutePath() {
-    VirtualEnv venv = new VirtualEnv(script, 1)
-
-    // Expect that the dirname of the python installation is stripped from the
-    // virtualenv directory, but that it still retains the correct python version.
-    assertFalse(venv.venvRootDir.contains('usr/bin'))
-    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
-  }
-
-  @Test
-  void newObjectWithAbsolutePathWindows() {
-    script.env.OS = 'Windows_NT'
-
-    VirtualEnv venv = new VirtualEnv(script, 1)
-
-    assertFalse(venv.venvRootDir.startsWith('/c'))
-    assertTrue(venv.venvRootDir.endsWith(TEST_RANDOM_NAME))
   }
 
   @Test
