@@ -54,12 +54,16 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 0)
-    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+    List shMocks = [
+      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 0),
+      new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
+    ]
+    shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
 
     assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+    shMocks.each { mock -> assertCallStackContains(mock[0]) }
   }
 
   @Test
@@ -68,12 +72,16 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 0)
-    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+    List shMocks = [
+      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 0),
+      new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
+    ]
+    shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv("${pythonVersion}\n", 1)
 
     assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+    shMocks.each { mock -> assertCallStackContains(mock[0]) }
   }
 
   @Test
@@ -82,17 +90,17 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 1)
-    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+    List shMocks = [
+      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 1),
+      new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
+    ]
+    shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
 
     assertThrows(Exception) {
       new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
     }
 
-    assertEquals(3, helper.callStack.findAll { call ->
-      call.methodName == 'sh' &&
-        call.args[0].label == 'Install Python version 1.2.3 with pyenv'
-    }.size())
+    shMocks.each { mock -> assertCallStackContains(mock[0]) }
   }
 
   @Test
