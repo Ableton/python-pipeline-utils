@@ -64,14 +64,14 @@ class PyenvTest extends BasePipelineTest {
 
   @Test
   void createVirtualEnvWithTrailingNewline() {
-    String pythonVersion = '1.2.3\n'
+    String pythonVersion = '1.2.3'
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
-    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 1)
+    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 0)
     helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
 
-    Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+    Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv("${pythonVersion}\n", 1)
 
     assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
   }
