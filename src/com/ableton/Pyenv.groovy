@@ -44,7 +44,7 @@ class Pyenv implements Serializable {
 
     String trimmedPythonVersion = pythonVersion.trim()
 
-    if (!script.isUnix()) {
+    if (script.env.OS == 'Windows_NT') {
       script.error 'This method is not supported on Windows'
     }
 
@@ -93,7 +93,7 @@ class Pyenv implements Serializable {
     assertPyenvRoot()
     boolean result = false
 
-    if (!script.isUnix()) {
+    if (script.env.OS == 'Windows_NT') {
       script.error 'This method is not supported on Windows'
     }
 
