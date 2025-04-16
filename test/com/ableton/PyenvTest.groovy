@@ -130,15 +130,16 @@ class PyenvTest extends BasePipelineTest {
   void createVirtualEnvUnsupportedPythonVersion() {
     String pythonVersion = '6.6.6'
     String pyenvRoot = '/mock/pyenv/root'
+    boolean errorCalled = false
     helper.registerAllowedMethod('error', [String]) { errorCalled = true }
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.0.0', 0)
     helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
-    helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 1)
 
-    assertThrows(Exception) {
-      new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
-    }
+    new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+
+    assertTrue(errorCalled)
   }
 
   @Test
