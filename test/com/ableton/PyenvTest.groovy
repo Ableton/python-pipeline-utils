@@ -55,7 +55,6 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
     helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 0)
-    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
     helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
@@ -70,7 +69,6 @@ class PyenvTest extends BasePipelineTest {
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     helper.registerAllowedMethod('isUnix', []) { return true }
     helper.addShMock(installCommands(pyenvRoot, pythonVersion), '', 1)
-    helper.addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
     helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
 
     Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
@@ -86,7 +84,6 @@ class PyenvTest extends BasePipelineTest {
       registerAllowedMethod('fileExists', [String]) { return true }
       registerAllowedMethod('isUnix', []) { return true }
       addShMock(installCommands(pyenvRoot, pythonVersion), '', 1)
-      addShMock("${pyenvRoot}/bin/pyenv --version", 'pyenv 1.2.3', 0)
       addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
     }
 
