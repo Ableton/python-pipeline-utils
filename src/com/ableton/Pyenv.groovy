@@ -23,7 +23,8 @@ class Pyenv implements Serializable {
 
   Pyenv(Object script, String pyenvRoot) {
     this.script = script
-    this.pyenvRoot = pyenvRoot
+    this.pyenvRoot = script.env.OS == 'Windows_NT' ?
+      pyenvRoot.replace('\\', '/') : pyenvRoot
   }
 
   /**
@@ -44,10 +45,6 @@ class Pyenv implements Serializable {
 
     String trimmedPythonVersion = pythonVersion.trim()
 
-    if (script.env.OS == 'Windows_NT') {
-      script.error 'This method is not supported on Windows'
-    }
-
     if (!versionSupported(trimmedPythonVersion)) {
       script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
         String pyenvVersion = script.sh(
@@ -62,20 +59,31 @@ class Pyenv implements Serializable {
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.retry(INSTALLATION_RETRIES) {
-      List installCommands = [
-        "export PYENV_ROOT=${pyenvRoot}",
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
-        'eval "\$(pyenv init --path)"',
-        'eval "\$(pyenv init -)"',
-        "pyenv install --skip-existing ${trimmedPythonVersion}",
-        "pyenv shell ${trimmedPythonVersion}",
-        'pip install virtualenv',
-        "virtualenv ${venv.venvRootDir}",
-      ]
-      venv.script.sh(
-        label: "Install Python version ${trimmedPythonVersion} with pyenv",
-        script: installCommands.join('\n') + '\n',
-      )
+      script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
+        List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
+        if (script.env.OS != 'Windows_NT') {
+          installCommands += [
+            "export PATH=\$PYENV_ROOT/bin:\$PATH",
+            'eval "\$(pyenv init --path)"',
+            'eval "\$(pyenv init -)"',
+          ]
+        } else {
+          String posixPyenvRoot = pyenvRoot[1] == ':' ?
+            "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
+          installCommands.add(
+            "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
+          )
+        }
+        installCommands += [
+          "pyenv install --skip-existing ${trimmedPythonVersion}",
+          'pyenv exec pip install virtualenv',
+          "pyenv exec virtualenv ${venv.venvRootDir}",
+        ]
+        venv.script.sh(
+          label: "Install Python version ${trimmedPythonVersion} with pyenv",
+          script: installCommands.join('\n') + '\n',
+        )
+      }
     }
 
     return venv
@@ -92,10 +100,6 @@ class Pyenv implements Serializable {
     assert pythonVersion
     assertPyenvRoot()
     boolean result = false
-
-    if (script.env.OS == 'Windows_NT') {
-      script.error 'This method is not supported on Windows'
-    }
 
     script.withEnv(["PYENV_ROOT=${pyenvRoot}"]) {
       String allVersions = script.sh(
