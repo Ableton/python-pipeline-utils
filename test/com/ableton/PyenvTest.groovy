@@ -135,6 +135,7 @@ class PyenvTest extends BasePipelineTest {
 
     assertTrue(new Pyenv(script, pyenvRoot).versionSupported('2.1.3'))
     assertFalse(new Pyenv(script, pyenvRoot).versionSupported('2.1.3333'))
+    assertCallStackContains("${pyenvRoot}/bin/pyenv install --list")
   }
 
   @Test
