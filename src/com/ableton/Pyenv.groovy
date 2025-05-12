@@ -58,6 +58,7 @@ class Pyenv implements Serializable {
     }
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
+    int attemptNumber = 0
     script.retry(INSTALLATION_RETRIES) {
       script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
         List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
@@ -74,11 +75,13 @@ class Pyenv implements Serializable {
             "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
           )
         }
+        String forceArgument = attemptNumber ? '--force' : ''
         installCommands += [
-          "pyenv install --skip-existing ${trimmedPythonVersion}",
+          "pyenv install --skip-existing ${forceArgument} ${trimmedPythonVersion}",
           'pyenv exec pip install virtualenv',
           "pyenv exec virtualenv ${venv.venvRootDir}",
         ]
+        attemptNumber += 1
         venv.script.sh(
           label: "Install Python version ${trimmedPythonVersion} with pyenv",
           script: installCommands.join('\n') + '\n',
