@@ -179,26 +179,26 @@ class PyenvTest extends BasePipelineTest {
     boolean isUnix = true,
     String posixPyenvRoot = null
   ) {
-    List installCommands = [
+    List commands = [
       "export PYENV_ROOT=${pyenvRoot}",
     ]
     if (isUnix) {
-      installCommands += [
+      commands += [
         "export PATH=\$PYENV_ROOT/bin:\$PATH",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
     } else {
-      installCommands += [
+      commands += [
         "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH",
       ]
     }
-    installCommands += [
+    commands += [
       "pyenv install --skip-existing ${pythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv /workspace/.venv/${TEST_RANDOM_NAME}",
     ]
 
-    return installCommands.join('\n') + '\n'
+    return commands.join('\n') + '\n'
   }
 }
