@@ -94,6 +94,9 @@ class PyenvTest extends BasePipelineTest {
       new Tuple(installCommands(
         pyenvRoot: pyenvRoot, pythonVersion: pythonVersion
       ), '', 1),
+      new Tuple(installCommands(
+        pyenvRoot: pyenvRoot, pythonVersion: pythonVersion, retry: true
+      ), '', 1),
       new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
     ]
     shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
@@ -103,6 +106,31 @@ class PyenvTest extends BasePipelineTest {
     }
 
     shMocks.each { mock -> assertCallStackContains(mock[0]) }
+  }
+
+  @SuppressWarnings('ThrowException')
+  @Test
+  void createVirtualEnvInstallationFailsButPassesOnRetry() {
+    String pythonVersion = '1.2.3'
+    String pyenvRoot = '/mock/pyenv/root'
+    helper.registerAllowedMethod('fileExists', [String]) { return true }
+    helper.addShMock("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0)
+    helper.addShMock(installCommands(
+      pyenvRoot: pyenvRoot, pythonVersion: pythonVersion)
+    ) { return [stdout: '', exitValue: 1] }
+    boolean forceCalled = false
+    helper.addShMock(installCommands(
+      pyenvRoot: pyenvRoot, pythonVersion: pythonVersion, retry: true)
+    ) {
+      forceCalled = true
+      // Installation should succeed with `--force`
+      return [stdout: '', exitValue: 0]
+    }
+
+    new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+
+    // We just want to make sure that our mock with `--force` was reached
+    assertTrue(forceCalled)
   }
 
   @Test
@@ -187,6 +215,7 @@ class PyenvTest extends BasePipelineTest {
     String pythonVersion = args.pythonVersion
     boolean isUnix = args.isUnix != null ? args.isUnix : true
     String posixPyenvRoot = args.posixPyenvRoot
+    String installArgs = args.retry ? '--force' : '--skip-existing'
 
     assert pyenvRoot
     assert pythonVersion
@@ -206,7 +235,7 @@ class PyenvTest extends BasePipelineTest {
       ]
     }
     commands += [
-      "pyenv install --skip-existing ${pythonVersion}",
+      "pyenv install ${installArgs} ${pythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv /workspace/.venv/${TEST_RANDOM_NAME}",
     ]
