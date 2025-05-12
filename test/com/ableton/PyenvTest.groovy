@@ -53,7 +53,9 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     List shMocks = [
-      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 0),
+      new Tuple(installCommands(
+        pyenvRoot: pyenvRoot, pythonVersion: pythonVersion
+      ), '', 0),
       new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
     ]
     shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
@@ -70,7 +72,9 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     List shMocks = [
-      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 0),
+      new Tuple(installCommands(
+        pyenvRoot: pyenvRoot, pythonVersion: pythonVersion
+      ), '', 0),
       new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
     ]
     shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
@@ -87,7 +91,9 @@ class PyenvTest extends BasePipelineTest {
     String pyenvRoot = '/mock/pyenv/root'
     helper.registerAllowedMethod('fileExists', [String]) { return true }
     List shMocks = [
-      new Tuple(installCommands(pyenvRoot, pythonVersion), '', 1),
+      new Tuple(installCommands(
+        pyenvRoot: pyenvRoot, pythonVersion: pythonVersion
+      ), '', 1),
       new Tuple("${pyenvRoot}/bin/pyenv install --list", '1.2.3', 0),
     ]
     shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
@@ -107,8 +113,11 @@ class PyenvTest extends BasePipelineTest {
     String shPyenvRoot = 'C:/mock/pyenv/root'
     List shMocks = [
       new Tuple(installCommands(
-        shPyenvRoot, pythonVersion, false, posixPyenvRoot), '', 0
-      ),
+        pyenvRoot: shPyenvRoot,
+        pythonVersion: pythonVersion,
+        isUnix: false,
+        posixPyenvRoot: posixPyenvRoot,
+      ), '', 0),
       new Tuple("${shPyenvRoot}/bin/pyenv install --list", '''Available versions:
   1.2.3
 ''', 0),
@@ -173,12 +182,15 @@ class PyenvTest extends BasePipelineTest {
     assertCallStackContains("${shPyenvRoot}/bin/pyenv install --list")
   }
 
-  private String installCommands(
-    String pyenvRoot,
-    String pythonVersion,
-    boolean isUnix = true,
-    String posixPyenvRoot = null
-  ) {
+  private String installCommands(Map args) {
+    String pyenvRoot = args.pyenvRoot
+    String pythonVersion = args.pythonVersion
+    boolean isUnix = args.isUnix != null ? args.isUnix : true
+    String posixPyenvRoot = args.posixPyenvRoot
+
+    assert pyenvRoot
+    assert pythonVersion
+
     List commands = [
       "export PYENV_ROOT=${pyenvRoot}",
     ]
