@@ -217,6 +217,9 @@ class PyenvTest extends BasePipelineTest {
     String posixPyenvRoot = args.posixPyenvRoot
     String forceArg = args.force ? '--force' : ''
 
+    assert pyenvRoot
+    assert pythonVersion
+
     List commands = [
       "export PYENV_ROOT=${pyenvRoot}",
     ]
