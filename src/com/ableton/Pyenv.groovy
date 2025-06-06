@@ -58,31 +58,21 @@ class Pyenv implements Serializable {
     }
 
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
-    script.retry(INSTALLATION_RETRIES) {
-      script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
-        List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
-        if (script.env.OS != 'Windows_NT') {
-          installCommands += [
-            "export PATH=\$PYENV_ROOT/bin:\$PATH",
-            'eval "\$(pyenv init --path)"',
-            'eval "\$(pyenv init -)"',
-          ]
-        } else {
-          String posixPyenvRoot = pyenvRoot[1] == ':' ?
-            "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
-          installCommands.add(
-            "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
-          )
-        }
-        installCommands += [
-          "pyenv install --skip-existing ${trimmedPythonVersion}",
-          'pyenv exec pip install virtualenv',
-          "pyenv exec virtualenv ${venv.venvRootDir}",
-        ]
+    script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
+      Object commands = installCommands(trimmedPythonVersion, '--skip-existing', venv)
+      try {
         venv.script.sh(
           label: "Install Python version ${trimmedPythonVersion} with pyenv",
-          script: installCommands.join('\n') + '\n',
+          script: commands.join('\n') + '\n',
         )
+      } catch (error) {
+        commands = installCommands(trimmedPythonVersion, '--force', venv)
+        script.retry(INSTALLATION_RETRIES - 1) {
+          venv.script.sh(
+            label: "Retry installing Python ${trimmedPythonVersion} with --force",
+            script: commands.join('\n') + '\n',
+          )
+        }
       }
     }
 
@@ -124,5 +114,35 @@ class Pyenv implements Serializable {
     if (!script.fileExists(pyenvRoot)) {
       script.error "pyenv root path '${pyenvRoot}' does not exist"
     }
+  }
+
+  protected List installCommands(
+    String trimmedPythonVersion, String installArgs, VirtualEnv venv
+  ) {
+    List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
+    if (script.env.OS != 'Windows_NT') {
+      installCommands += [
+        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        'eval "\$(pyenv init --path)"',
+        'eval "\$(pyenv init -)"',
+      ]
+    } else {
+      String posixPyenvRoot = pyenvRoot
+      if (pyenvRoot[1] == ':') {
+        String driveLetter = pyenvRoot[0].toLowerCase()
+        String pyenvPathRemainder = pyenvRoot.substring(3)
+        posixPyenvRoot = "/${driveLetter}/${pyenvPathRemainder}"
+      }
+      installCommands.add(
+        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
+      )
+    }
+
+    installCommands += [
+      "pyenv install ${installArgs} ${trimmedPythonVersion}",
+      'pyenv exec pip install virtualenv',
+      "pyenv exec virtualenv ${venv.venvRootDir}",
+    ]
+    return installCommands
   }
 }
