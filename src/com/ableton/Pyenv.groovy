@@ -60,7 +60,7 @@ class Pyenv implements Serializable {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.retry(INSTALLATION_RETRIES) {
       script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
-        List commands = installCommands(trimmedPythonVersion, venv)
+        List commands = installCommands(trimmedPythonVersion, venv, '--skip-existing')
         venv.script.sh(
           label: "Install Python version ${trimmedPythonVersion} with pyenv",
           script: commands.join('\n') + '\n',
@@ -108,7 +108,9 @@ class Pyenv implements Serializable {
     }
   }
 
-  protected List installCommands(String trimmedPythonVersion, VirtualEnv venv) {
+  protected List installCommands(
+    String trimmedPythonVersion, VirtualEnv venv, String installArgs
+  ) {
     List commands = ["export PYENV_ROOT=${pyenvRoot}"]
     if (script.env.OS != 'Windows_NT') {
       commands += [
@@ -124,7 +126,7 @@ class Pyenv implements Serializable {
       )
     }
     commands += [
-      "pyenv install --skip-existing ${trimmedPythonVersion}",
+      "pyenv install ${installArgs} ${trimmedPythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv ${venv.venvRootDir}",
     ]
