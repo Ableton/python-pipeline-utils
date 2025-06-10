@@ -60,28 +60,10 @@ class Pyenv implements Serializable {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.retry(INSTALLATION_RETRIES) {
       script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
-        List installCommands = ["export PYENV_ROOT=${pyenvRoot}"]
-        if (script.env.OS != 'Windows_NT') {
-          installCommands += [
-            "export PATH=\$PYENV_ROOT/bin:\$PATH",
-            'eval "\$(pyenv init --path)"',
-            'eval "\$(pyenv init -)"',
-          ]
-        } else {
-          String posixPyenvRoot = pyenvRoot[1] == ':' ?
-            "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
-          installCommands.add(
-            "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
-          )
-        }
-        installCommands += [
-          "pyenv install --skip-existing ${trimmedPythonVersion}",
-          'pyenv exec pip install virtualenv',
-          "pyenv exec virtualenv ${venv.venvRootDir}",
-        ]
+        List commands = installCommands(trimmedPythonVersion, venv)
         venv.script.sh(
           label: "Install Python version ${trimmedPythonVersion} with pyenv",
-          script: installCommands.join('\n') + '\n',
+          script: commands.join('\n') + '\n',
         )
       }
     }
@@ -124,5 +106,28 @@ class Pyenv implements Serializable {
     if (!script.fileExists(pyenvRoot)) {
       script.error "pyenv root path '${pyenvRoot}' does not exist"
     }
+  }
+
+  protected List installCommands(String trimmedPythonVersion, VirtualEnv venv) {
+    List commands = ["export PYENV_ROOT=${pyenvRoot}"]
+    if (script.env.OS != 'Windows_NT') {
+      commands += [
+        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        'eval "\$(pyenv init --path)"',
+        'eval "\$(pyenv init -)"',
+      ]
+    } else {
+      String posixPyenvRoot = pyenvRoot[1] == ':' ?
+        "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
+      commands.add(
+        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
+      )
+    }
+    commands += [
+      "pyenv install --skip-existing ${trimmedPythonVersion}",
+      'pyenv exec pip install virtualenv',
+      "pyenv exec virtualenv ${venv.venvRootDir}",
+    ]
+    return commands
   }
 }
