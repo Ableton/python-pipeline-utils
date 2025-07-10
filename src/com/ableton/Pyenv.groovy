@@ -122,7 +122,7 @@ class Pyenv implements Serializable {
     List commands = ["export PYENV_ROOT=${pyenvRoot}"]
     if (script.env.OS != 'Windows_NT') {
       commands += [
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        "export PATH=\$PYENV_ROOT/bin:/usr/bin:/bin",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
@@ -130,7 +130,7 @@ class Pyenv implements Serializable {
       String posixPyenvRoot = pyenvRoot[1] == ':' ?
         "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
       commands.add(
-        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
+        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:/usr/bin:/bin"
       )
     }
     commands += [
