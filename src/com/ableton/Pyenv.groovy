@@ -60,10 +60,12 @@ class Pyenv implements Serializable {
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
       List commands = installCommands(trimmedPythonVersion, venv, '--skip-existing')
-      venv.script.sh(
-        label: "Install Python version ${trimmedPythonVersion} with pyenv",
-        script: commands.join('\n') + '\n',
-      )
+      script.withEnv(["PYENV_DEBUG=1"]) {
+        venv.script.sh(
+          label: "Install Python version ${trimmedPythonVersion} with pyenv",
+          script: commands.join('\n') + '\n',
+        )
+      }
     }
 
     return venv
@@ -124,7 +126,7 @@ class Pyenv implements Serializable {
       )
     }
     commands += [
-      "pyenv install ${installArgs} ${trimmedPythonVersion}",
+      "pyenv install -v ${installArgs} ${trimmedPythonVersion}",
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv ${venv.venvRootDir}",
     ]
