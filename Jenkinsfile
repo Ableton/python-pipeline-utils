@@ -30,7 +30,7 @@ eventRecorder.timedStage('Integration Test') {
       // TODO: Fix this once the 12.5 (and newer) Macs are working
       String nodeLabel = "generic-${osType}"
       if (osType == 'mac') {
-        nodeLabel = 'generic-mac-xcode12.2'
+        nodeLabel = 'generic-mac-xcode15.2'
       }
       eventRecorder.timedNode(nodeLabel) {
         echo 'Test VirtualEnv.create'
