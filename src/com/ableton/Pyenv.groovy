@@ -126,7 +126,11 @@ class Pyenv implements Serializable {
       commands.add("export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH")
     } else {
       commands += [
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        // Unlike on Windows, we can't prepend to the $PATH because this causes problems
+        // on macOS with some Python versions, especially when other Python versions have
+        // been installed via MacPorts/Homebrew. Fortunately, we shouldn't need anything
+        // other than binaries in /usr/bin and /bin to build Python if necessary.
+        "export PATH=\$PYENV_ROOT/bin:/usr/bin:/bin",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
