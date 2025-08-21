@@ -129,9 +129,7 @@ class Pyenv implements Serializable {
     } else {
       String posixPyenvRoot = pyenvRoot[1] == ':' ?
         "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
-      commands.add(
-        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
-      )
+      commands.add("export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH")
     }
     commands += [
       "pyenv install ${installArgs} ${trimmedPythonVersion}",
