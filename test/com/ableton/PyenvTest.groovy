@@ -225,7 +225,7 @@ class PyenvTest extends BasePipelineTest {
     ]
     if (isUnix) {
       commands += [
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        "export PATH=\$PYENV_ROOT/bin:/usr/bin:/bin",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
