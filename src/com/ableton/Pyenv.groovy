@@ -120,16 +120,16 @@ class Pyenv implements Serializable {
     String trimmedPythonVersion, VirtualEnv venv, String installArgs
   ) {
     List commands = ["export PYENV_ROOT=${pyenvRoot}"]
-    if (script.env.OS != 'Windows_NT') {
+    if (script.env.OS == 'Windows_NT') {
+      String posixPyenvRoot = pyenvRoot[1] == ':' ?
+        "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
+      commands.add("export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH")
+    } else {
       commands += [
         "export PATH=\$PYENV_ROOT/bin:\$PATH",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
-    } else {
-      String posixPyenvRoot = pyenvRoot[1] == ':' ?
-        "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
-      commands.add("export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH")
     }
     commands += [
       "pyenv install ${installArgs} ${trimmedPythonVersion}",
