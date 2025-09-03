@@ -120,18 +120,20 @@ class Pyenv implements Serializable {
     String trimmedPythonVersion, VirtualEnv venv, String installArgs
   ) {
     List commands = ["export PYENV_ROOT=${pyenvRoot}"]
-    if (script.env.OS != 'Windows_NT') {
+    if (script.env.OS == 'Windows_NT') {
+      String posixPyenvRoot = pyenvRoot[1] == ':' ?
+        "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
+      commands.add("export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH")
+    } else {
       commands += [
-        "export PATH=\$PYENV_ROOT/bin:\$PATH",
+        // Unlike on Windows, we can't prepend to the $PATH because this causes problems
+        // on macOS with some Python versions, especially when other Python versions have
+        // been installed via MacPorts/Homebrew. Fortunately, we shouldn't need anything
+        // other than binaries in /usr/bin and /bin to build Python if necessary.
+        "export PATH=\$PYENV_ROOT/bin:/usr/bin:/bin",
         'eval "\$(pyenv init --path)"',
         'eval "\$(pyenv init -)"',
       ]
-    } else {
-      String posixPyenvRoot = pyenvRoot[1] == ':' ?
-        "/${pyenvRoot[0].toLowerCase()}/${pyenvRoot.substring(3)}" : pyenvRoot
-      commands.add(
-        "export PATH=${posixPyenvRoot}/shims:${posixPyenvRoot}/bin:\$PATH"
-      )
     }
     commands += [
       "pyenv install ${installArgs} ${trimmedPythonVersion}",
