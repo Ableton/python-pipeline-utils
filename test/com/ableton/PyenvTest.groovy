@@ -161,6 +161,35 @@ class PyenvTest extends BasePipelineTest {
   }
 
   @Test
+  void createVirtualEnvWindowsArm() {
+    String pythonVersion = '1.2.3'
+    String pyenvRoot = 'C:\\mock\\pyenv\\root'
+    String posixPyenvRoot = '/c/mock/pyenv/root'
+    String shPyenvRoot = 'C:/mock/pyenv/root'
+    List shMocks = [
+      new Tuple(installCommands(
+        pyenvRoot: shPyenvRoot,
+        pythonVersion: pythonVersion + '-arm',
+        isUnix: false,
+        posixPyenvRoot: posixPyenvRoot,
+      ), '', 0),
+      new Tuple("${shPyenvRoot}/bin/pyenv install --list", '''Available versions:
+  1.2.3
+  1.2.3-arm
+''', 0),
+    ]
+    shMocks.each { mock -> helper.addShMock(mock[0], mock[1], mock[2]) }
+    helper.registerAllowedMethod('fileExists', [String]) { return true }
+    script.env['OS'] = 'Windows_NT'
+    script.env['PROCESSOR_IDENTIFIER'] = 'ARMv8 (64-bit) Family 8 Model AC4 Revision 0'
+
+    Object venv = new Pyenv(script, pyenvRoot).createVirtualEnv(pythonVersion, 1)
+
+    assertEquals("/workspace/.venv/${TEST_RANDOM_NAME}" as String, venv.venvRootDir)
+    shMocks.each { mock -> assertCallStackContains(mock[0]) }
+  }
+
+  @Test
   void createVirtualEnvUnsupportedPythonVersion() {
     String pythonVersion = '6.6.6'
     String pyenvRoot = '/mock/pyenv/root'
