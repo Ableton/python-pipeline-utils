@@ -57,6 +57,17 @@ class Pyenv implements Serializable {
       }
     }
 
+    // For Windows ARM, see if there is a ARM binary that can be used to avoid running
+    // Python under PRISM.
+    if (script.env.OS == 'Windows_NT' &&
+      // If Java is an x86 binary on ARM64 running under PRISM, env.PROCESSOR_ARCHITECTURE
+      // will report AMD64, so we need to use env.PROCESSOR_IDENTIFIER instead.
+      script.env.PROCESSOR_IDENTIFIER?.startsWith('ARMv8') &&
+      versionSupported(trimmedPythonVersion + '-arm')
+    ) {
+      trimmedPythonVersion += '-arm'
+    }
+
     VirtualEnv venv = new VirtualEnv(script, randomSeed)
     script.withEnv(["PYENV_VERSION=${trimmedPythonVersion}"]) {
       try {
