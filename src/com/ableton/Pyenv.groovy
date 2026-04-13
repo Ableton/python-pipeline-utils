@@ -150,6 +150,7 @@ class Pyenv implements Serializable {
       "pyenv install ${installArgs} ${trimmedPythonVersion}",
       'pyenv version',
       'pyenv exec python --version',
+      'pyenv exec pip -V',
       'pyenv exec pip install virtualenv',
       "pyenv exec virtualenv ${venv.venvRootDir}",
     ]
