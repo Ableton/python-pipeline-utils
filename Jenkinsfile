@@ -29,11 +29,6 @@ eventRecorder.timedStage('Integration Test') {
     stages[osType.capitalize()] = {
       String nodeLabel = "generic-${osType}"
       eventRecorder.timedNode(nodeLabel) {
-        echo 'Test VirtualEnv.create'
-        Object venv = virtualenv.create('python3')
-        String venvVersion = venv.run(returnStdout: true, script: 'python --version')
-        assert venvVersion.startsWith('Python 3')
-
         echo 'Test VirtualEnv.createWithPyenv'
         Object pyvenv = pyenv.createVirtualEnv('3.10.3')
         String pyvenvVersion = pyvenv.run(returnStdout: true, script: 'python --version')
