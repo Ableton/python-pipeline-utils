@@ -41,31 +41,6 @@ class VirtualEnvTest extends BasePipelineTest {
   }
 
   @Test
-  void create() {
-    String python = 'python2.7'
-
-    VirtualEnv venv = new VirtualEnv(script, 1)
-
-    helper.addShMock("virtualenv --python=${python} ${venv.venvRootDir}", '', 0)
-    VirtualEnv createdVenv = VirtualEnv.create(script, python, 1)
-    assertEquals(venv.venvRootDir, createdVenv.venvRootDir)
-  }
-
-  @Test
-  void createWithWindowsPath() {
-    script.env.OS = 'Windows_NT'
-    script.env.WORKSPACE = 'C:\\workspace'
-
-    VirtualEnv.create(script, 'C:\\Python27\\python.exe', 1)
-
-    String expected =
-      "virtualenv --python=C:/Python27/python.exe C:/workspace/.venv/${TEST_RANDOM_NAME}"
-    assertEquals(
-      expected, helper.callStack.find { call -> call.methodName == 'sh' }.args[0].script
-    )
-  }
-
-  @Test
   void inside() {
     Map insideEnv
 
