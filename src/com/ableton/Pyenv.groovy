@@ -1,5 +1,7 @@
 package com.ableton
 
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
 
 /**
  * Uses pyenv (which must be installed on the node) to install a specific Python version
@@ -76,6 +78,8 @@ class Pyenv implements Serializable {
           label: "Install Python version ${trimmedPythonVersion} with pyenv",
           script: commands.join('\n') + '\n',
         )
+      } catch (FlowInterruptedException exception) {
+        throw exception
       } catch (error) {
         List commands = installCommands(trimmedPythonVersion, venv, '--force')
         script.retry(INSTALLATION_RETRIES - 1) {
