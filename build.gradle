@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
   implementation 'org.codehaus.groovy:groovy-all:2.4.21'
-  implementation 'org.jenkins-ci.main:jenkins-core:2.590'
+  implementation 'org.jenkins-ci.main:jenkins-core:2.591'
   implementation 'org.jenkins-ci.plugins.workflow:workflow-cps:4400.v300cf4f6cef5'
   implementation(
     'org.jenkins-ci.plugins.workflow:workflow-step-api:724.v538c2362b_dfb_@jar'
