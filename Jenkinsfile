@@ -1,5 +1,5 @@
-library(identifier: 'ableton-utils@0.29', changelog: false)
-library(identifier: 'groovylint@0.16', changelog: false)
+library(identifier: 'ableton-utils@0.32', changelog: false)
+library(identifier: 'groovylint@0.20', changelog: false)
 // Get python-utils library from current commit so it can test itself in this Jenkinsfile
 library "python-utils@${params.JENKINS_COMMIT}"
 
@@ -9,7 +9,9 @@ devToolsProject.run(
   test: { data ->
     parallel(
       groovydoc: { data['docs'] = groovydoc.generate() },
-      groovylint: { groovylint.check('./Jenkinsfile,./*.gradle,**/*.groovy') },
+      groovylint: {
+        groovylint.check(includesPattern: './Jenkinsfile,./*.gradle,**/*.groovy')
+      },
       junit: {
         junitUtils.run(testResults: 'build/test-results/**/*.xml') {
           sh './gradlew test --warning-mode fail'
